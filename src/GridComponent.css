@@ -1,0 +1,11 @@
+table.table.dx-g-bs4-table.table-striped{
+    margin: 0
+}
+
+thead{
+    line-height: 1;
+}
+
+tbody{
+    line-height: 0;
+}
