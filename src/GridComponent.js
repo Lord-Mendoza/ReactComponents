@@ -111,7 +111,7 @@ class GridComponent extends Component {
     //================================== REACT STATE COMPONENTS ========================================================
 
     componentDidMount() {
-        const {columns, rows, pageSizing, toggleSelect} = this.props;
+        const {columns, rows, pageSizing, toggleSelect, viewOnly} = this.props;
 
         //Setting up the columns
         let gridColumns = columns.map(v => {
@@ -154,7 +154,14 @@ class GridComponent extends Component {
             return {columnName: v.replace(/\s/g, ""), width: 180};
         });
 
-        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled, columnWidths});
+        //Checking if the user opted to render a grid with a menu
+        let isViewOnly = true;
+        if (viewOnly !== undefined) {
+            isViewOnly = this.props.viewOnly;
+        }
+
+        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled,
+            isViewOnly, columnWidths});
     }
 
     componentDidUpdate(prevProps) {
@@ -209,7 +216,7 @@ class GridComponent extends Component {
     //=========================================== RENDER ===============================================================
     render() {
         const {rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
-            selection, selectionToggled} = this.state;
+            selection, selectionToggled, isViewOnly} = this.state;
 
         let selectionState;
         let integratedSelection;
@@ -226,31 +233,32 @@ class GridComponent extends Component {
             />
         }
 
+        let gridOptions;
+        if (!isViewOnly){
+            let btnAdd = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                    <Image src='./add.png'/> Create
+                </Button>;
+
+            let btnEdit = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                    <Image src='./edit.png'/> Edit
+                </Button>;
+
+            let btnDelete = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                    <Image src='./reject.png'/> Delete
+                </Button>;
+
+            gridOptions = (<Col>{btnAdd} {btnEdit} {btnDelete}</Col>)
+        }
+
 
         return (
             <div style={{fontSize: '12px'}}>
 
-                {/*=============================== Nav Bar Portion ===============================*/}
+                {/*=============================== Menu Bar Portion ===============================*/}
 
                 <Container fluid={true} style={{marginRight: 1}}>
                     <Row noGutters={true}>
-                        <Col>
-                            <b style={{paddingRight: 50, paddingLeft: 5, verticalAlign: 'middle', fontSize: 15}}>
-                                Title
-                            </b>
-
-                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                                <Image src='./add.png'/> Create
-                            </Button>
-
-                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                                <Image src='./edit.png'/> Edit
-                            </Button>
-
-                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                                <Image src='./reject.png'/> Delete
-                            </Button>
-                        </Col>
+                        {gridOptions}
 
                         <Col style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
                             <Button variant="light">
