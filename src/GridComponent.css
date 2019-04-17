@@ -32,6 +32,10 @@ div.container-fluid {
     background-color: #d3e1f1;
 }
 
-button.btn.btn-outline-dark{
+button.btn.btn-outline-dark {
     padding: 5px;
+}
+
+td.text-center.align-middle{
+    padding: 0;
 }

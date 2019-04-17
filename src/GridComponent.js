@@ -1,10 +1,21 @@
 /*
 Lord Mendoza - 4/16/19
 
-The grid component takes a list of columns & generates a fully-featured grid that can be interacted
-with by the user. Several functions are available such as sorting, paginating, adjusting column
-widths, and adding/updating/deleting (including multi-delete)/searching/refreshing.
-
+The grid component takes a list of columns & generates a fully-featured grid that can be interacted with by the user.
+Several functions are available such as sorting, paginating, adjusting column widths, and adding/updating/deleting
+(including multi-delete)/searching/refreshing.
+-------
+Pre-requisites:
+*Include the following dependencies your package.json:
+	"@devexpress/dx-react-core": "^1.10.1",
+    "@devexpress/dx-react-grid": "^1.10.1",
+    "@devexpress/dx-react-grid-bootstrap4": "^1.10.5",
+    "bootstrap": "^4.3.1",
+*Include the following in your index.js
+	import 'bootstrap/dist/css/bootstrap.min.css';
+*Wherever you're using this component, include:
+	import GridComponent from "./GridComponent";
+-------
 Contains the following props (required ones are indicated with (r))
 1) (r) "columns" = takes an array of strings
 	[
@@ -13,25 +24,26 @@ Contains the following props (required ones are indicated with (r))
 
 2) (r) "rows" = takes a Json array
 	[
-		{<name of corresponding column>: <column value>, <next column>: <column value>, ...},
+		{<name of column>: <column value>, <next column>: <column value>, ...},
 		...
 	]
-Note: for proper sorting behavior, ensure to pass numbers as column value for number-typed columns, rather
-than "10", or "11".
+Note: for proper sorting behavior, ensure to pass numbers as column value for number-typed columns, rather than "10" or "11".
 
-2) (r) "showControls" = takes a boolean
-3) "defaultPageSize" = takes a number; set to 10 by default
-4) "showSelectBtn" = takes a boolean; set to false by default
-5) "pageSizes" = takes an array of numbers; set to [10, 50, 100] by default
+3) "pageSizing" = takes an array composed of two values:
+	i. the default page size set
+	ii. the page size options
+
+4) "toggleSelect" = takes a boolean; set to false by default
+5) "showControls" = takes a boolean; set to false by default
 
 Sample usage:
 	<GridComponent columns={varJsonArray}
-				   showControls=true
-				   defaultPageSize=25
-				   showSelectBtn=true
-				   pageSizes=[25, 50, 100]
+				   rows={varJsonArray}
+				   pageSizing=[25, [25, 50, 100]]
+				   toggleSelect={true}
+				   showControls={true}
 	   />
- */
+*/
 //======================================================================================================================
 //============================================= IMPORTS ================================================================
 
@@ -41,26 +53,26 @@ import './GridComponent.css';
 
 //DevExpress Grid
 import {
+    IntegratedPaging, IntegratedSelection,
+    IntegratedSorting,
+    PagingState,
+    SelectionState,
+    SortingState
+} from "@devexpress/dx-react-grid";
+import {
     Grid, PagingPanel,
     Table, TableColumnResizing,
-    TableHeaderRow,
+    TableHeaderRow, TableSelection,
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
-import {IntegratedPaging, IntegratedSorting, PagingState, SortingState} from "@devexpress/dx-react-grid";
+
 import {
     Button,
-    ButtonToolbar,
     Col,
     Container,
-    Dropdown,
-    Form,
     Image,
-    OverlayTrigger,
-    Popover,
     Row
 } from "react-bootstrap";
-import {FaRedo, FaSearch} from "react-icons/fa";
-
 //======================================================================================================================
 //================================= GLOBAL VARIABLES FOR GRID CONFIGURATION ============================================
 
@@ -84,17 +96,22 @@ class GridComponent extends Component {
             columnWidths: [],
             pageSize: 10,
             pageSizes: [10, 50, 100],
-            currentPage: 0
+            currentPage: 0,
+            selection: []
         };
 
         this.changeSorting = sorting => this.setState({sorting});
         this.changeColumnWidths = (columnWidths) => {this.setState({columnWidths})};
         this.changeCurrentPage = currentPage => this.setState({currentPage});
         this.changePageSize = pageSize => this.setState({pageSize});
+        this.changeSelection = selection => this.setState({selection});
     }
 
+    //==================================================================================================================
+    //================================== REACT STATE COMPONENTS ========================================================
+
     componentDidMount() {
-        const {columns, rows, pageSizing} = this.props;
+        const {columns, rows, pageSizing, toggleSelect} = this.props;
 
         //Setting up the columns
         let gridColumns = columns.map(v => {
@@ -125,12 +142,19 @@ class GridComponent extends Component {
             }
         }
 
-        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes});
+        //Setting up selection state if its enabled or not
+        let selectionToggled = false;
+        if (toggleSelect !== undefined) {
+            if (toggleSelect)
+                selectionToggled = toggleSelect;
+        }
+
+        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled});
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.columns !== prevProps.columns || this.props.rows !== prevProps.rows) {
-            const {columns, rows, pageSizing} = this.props;
+            const {columns, rows, pageSizing, toggleSelect} = this.props;
 
             //Setting up the columns
             let gridColumns = columns.map(v => {
@@ -161,12 +185,37 @@ class GridComponent extends Component {
                 }
             }
 
-            this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes});
+            //Setting up selection state if its enabled or not
+            let selectionToggled = false;
+            if (toggleSelect !== undefined) {
+                if (toggleSelect)
+                    selectionToggled = toggleSelect;
+            }
+
+            this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled});
         }
     }
 
+    //=========================================== RENDER ===============================================================
     render() {
-        const {rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage} = this.state;
+        const {rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
+            selection, selectionToggled} = this.state;
+
+        let selectionState;
+        let integratedSelection;
+        let tableSelection;
+        if (selectionToggled) {
+            selectionState = <SelectionState
+                selection={selection}
+                onSelectionChange={this.changeSelection}
+            />;
+            integratedSelection = <IntegratedSelection />;
+            tableSelection = <TableSelection
+                selectByRowClick
+                showSelectAll
+            />
+        }
+
 
         return (
             <div style={{fontSize: '12px'}}>
@@ -206,6 +255,8 @@ class GridComponent extends Component {
                     rows={rows}
                     columns={columns}
                 >
+                    {selectionState}
+
                     <SortingState
                         sorting={sorting}
                         onSortingChange={this.changeSorting}
@@ -218,6 +269,7 @@ class GridComponent extends Component {
                         onPageSizeChange={this.changePageSize}
                     />
 
+                    {integratedSelection}
                     <IntegratedPaging/>
                     <IntegratedSorting/>
                     <Table
@@ -230,6 +282,7 @@ class GridComponent extends Component {
                     />
 
                     <TableHeaderRow showSortingControls/>
+                    {tableSelection}
 
                     <PagingPanel
                         pageSizes={pageSizes}
