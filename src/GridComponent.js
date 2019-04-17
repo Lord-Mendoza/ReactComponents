@@ -176,40 +176,21 @@ class GridComponent extends Component {
                 <Container fluid={true} style={{marginRight: 1}}>
                     <Row noGutters={true}>
                         <Col>
-                            <Form inline="true">
-                                <Form.Group>
-                                    {/*<Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                                        <Image src='./add.png' /> Create
-                                    </Button>*/}
+                            <b style={{paddingRight: 50, paddingLeft: 5, verticalAlign: 'middle', fontSize: 15}}>
+                                Title
+                            </b>
 
-                                    {/*<Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                                        <Image src='./actions.png' /> Actions
-                                    </Button>*/}
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="light" >
-                                            <Image src='./actions.png' /> Actions
-                                        </Dropdown.Toggle>
+                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                                <Image src='./add.png'/> Create
+                            </Button>
 
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item><Image src='./add.png'/> Create </Dropdown.Item>
-                                            <Dropdown.Divider />
-                                            <Dropdown.Item><Image src='./edit.png'/> Edit </Dropdown.Item>
-                                            <Dropdown.Divider />
-                                            <Dropdown.Item><Image src='./reject.png'/> Delete </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
+                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                                <Image src='./edit.png'/> Edit
+                            </Button>
 
-                                    <Form.Control as="select" className="Search" style={{fontSize: 12, marginLeft: 10}}
-                                                  value="default">
-                                        <option disabled value = {"default"} key={0}>Select Column...</option>
-                                    </Form.Control>
-
-                                    <Form.Control type="text" placeholder="Search Value" style={{fontSize: 12}}/>
-                                </Form.Group>
-
-                                <Button variant="outline-dark"> <FaSearch/> </Button>
-                                <Button variant="outline-dark"> <FaRedo/> </Button>
-                            </Form>
+                            <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                                <Image src='./reject.png'/> Delete
+                            </Button>
                         </Col>
 
                         <Col style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
@@ -218,29 +199,6 @@ class GridComponent extends Component {
                             </Button>
                         </Col>
                     </Row>
-
-                    {/*<Row noGutters={true}>
-                        <Button variant="danger">
-                            Delete Selected
-                        </Button>
-
-                        <ButtonToolbar>
-                            <OverlayTrigger trigger="hover" key="right" placement="right"
-                                            overlay={
-                                                <Popover id={`popover-position-right`}
-                                                         title={`Hint`}>
-
-                                                    To make selection(s), either click on the checkbox or directly
-                                                    on the row.
-                                                </Popover>
-                                            }
-                            >
-
-                                <Button variant="light"> ? </Button>
-
-                            </OverlayTrigger>
-                        </ButtonToolbar>
-                    </Row>*/}
                 </Container>
 
                 {/*=============================== Grid Portion ===============================*/}

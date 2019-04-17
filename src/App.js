@@ -56,6 +56,7 @@ class App extends Component {
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
                                pageSizing={this.state.pageSizing}
+                               toggleSelect={true}
                 />
             </div>
         );
