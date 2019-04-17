@@ -148,8 +148,13 @@ class GridComponent extends Component {
             if (toggleSelect)
                 selectionToggled = toggleSelect;
         }
+        
+        //Setting up widths for viewing
+        let columnWidths = columns.map(v => {
+            return {columnName: v.replace(/\s/g, ""), width: 180};
+        });
 
-        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled});
+        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled, columnWidths});
     }
 
     componentDidUpdate(prevProps) {
@@ -192,7 +197,12 @@ class GridComponent extends Component {
                     selectionToggled = toggleSelect;
             }
 
-            this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled});
+            //Setting up widths for viewing
+            let columnWidths = columns.map(v => {
+                return {columnName: v.replace(/\s/g, ""), width: 180};
+            });
+
+            this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled, columnWidths});
         }
     }
 
