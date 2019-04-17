@@ -47,6 +47,7 @@ import {
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 import {IntegratedPaging, IntegratedSorting, PagingState, SortingState} from "@devexpress/dx-react-grid";
+import {Image, Nav, Navbar, NavDropdown} from "react-bootstrap";
 
 //======================================================================================================================
 //================================= GLOBAL VARIABLES FOR GRID CONFIGURATION ============================================
@@ -158,6 +159,28 @@ class GridComponent extends Component {
         return (
             <div style={{fontSize: '12px'}}>
 
+                {/*=============================== Nav Bar Portion ===============================*/}
+
+                <Navbar variant="light">
+                    <Nav className="mr-auto">
+                        <Nav.Link> <Image src="reset.png"/> Reset </Nav.Link>
+                        <Nav.Link> <Image src="search.png"/> Search </Nav.Link>
+
+                        <NavDropdown title={<div className="pull-left">
+                            <Image src="actions.png"/> Actions
+                        </div>}>
+                            <NavDropdown.Item>
+                                <Image src="edit.png"/> Edit
+                            </NavDropdown.Item>
+
+                            <NavDropdown.Item>
+                                <Image src="reject.png"/> Delete
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                </Navbar>
+
+                {/*=============================== Grid Portion ===============================*/}
                 <Grid
                     rows={rows}
                     columns={columns}
