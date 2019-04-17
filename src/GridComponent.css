@@ -9,3 +9,7 @@ thead{
 tbody{
     line-height: 0;
 }
+
+td.text-center.align-middle{
+    padding: 0;
+}

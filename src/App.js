@@ -18,13 +18,13 @@ const data2 = [{"Make": "Honda", "Model": "Civic", "Color": "Black"},
 
 const sampleData = (len) => {
     let retVal = [];
-    for (let i = 0; i < len; i++){
-        retVal.push({"Make": "Make" + i, "Model": "Model" + i, "Color": "Color" + i});
+    for (let i = 1; i <= len; i++){
+        retVal.push({"Make": "Make Sample" + i, "Model": "Model Sample" + i, "Color": "Color Sample" + i});
     }
     return retVal;
 };
 
-const pageSizing = [10, [10, 25, 30]];
+const pageSizing = [10, [10, 50, 100]];
 
 class App extends Component {
     constructor(props){
@@ -56,6 +56,7 @@ class App extends Component {
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
                                pageSizing={this.state.pageSizing}
+                               toggleSelect={false}
                 />
             </div>
         );
