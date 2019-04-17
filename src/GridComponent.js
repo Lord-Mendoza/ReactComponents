@@ -47,7 +47,19 @@ import {
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 import {IntegratedPaging, IntegratedSorting, PagingState, SortingState} from "@devexpress/dx-react-grid";
-import {Image, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {
+    Button,
+    ButtonToolbar,
+    Col,
+    Container,
+    Dropdown,
+    Form,
+    Image,
+    OverlayTrigger,
+    Popover,
+    Row
+} from "react-bootstrap";
+import {FaRedo, FaSearch} from "react-icons/fa";
 
 //======================================================================================================================
 //================================= GLOBAL VARIABLES FOR GRID CONFIGURATION ============================================
@@ -161,24 +173,75 @@ class GridComponent extends Component {
 
                 {/*=============================== Nav Bar Portion ===============================*/}
 
-                <Navbar variant="light">
-                    <Nav className="mr-auto">
-                        <Nav.Link> <Image src="reset.png"/> Reset </Nav.Link>
-                        <Nav.Link> <Image src="search.png"/> Search </Nav.Link>
+                <Container fluid={true} style={{marginRight: 1}}>
+                    <Row noGutters={true}>
+                        <Col>
+                            <Form inline="true">
+                                <Form.Group>
+                                    {/*<Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                                        <Image src='./add.png' /> Create
+                                    </Button>*/}
 
-                        <NavDropdown title={<div className="pull-left">
-                            <Image src="actions.png"/> Actions
-                        </div>}>
-                            <NavDropdown.Item>
-                                <Image src="edit.png"/> Edit
-                            </NavDropdown.Item>
+                                    {/*<Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
+                                        <Image src='./actions.png' /> Actions
+                                    </Button>*/}
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="light" >
+                                            <Image src='./actions.png' /> Actions
+                                        </Dropdown.Toggle>
 
-                            <NavDropdown.Item>
-                                <Image src="reject.png"/> Delete
-                            </NavDropdown.Item>
-                        </NavDropdown>
-                    </Nav>
-                </Navbar>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item><Image src='./add.png'/> Create </Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            <Dropdown.Item><Image src='./edit.png'/> Edit </Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            <Dropdown.Item><Image src='./reject.png'/> Delete </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+
+                                    <Form.Control as="select" className="Search" style={{fontSize: 12, marginLeft: 10}}
+                                                  value="default">
+                                        <option disabled value = {"default"} key={0}>Select Column...</option>
+                                    </Form.Control>
+
+                                    <Form.Control type="text" placeholder="Search Value" style={{fontSize: 12}}/>
+                                </Form.Group>
+
+                                <Button variant="outline-dark"> <FaSearch/> </Button>
+                                <Button variant="outline-dark"> <FaRedo/> </Button>
+                            </Form>
+                        </Col>
+
+                        <Col style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
+                            <Button variant="light">
+                                <Image src='./reset.png'/> Refresh
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    {/*<Row noGutters={true}>
+                        <Button variant="danger">
+                            Delete Selected
+                        </Button>
+
+                        <ButtonToolbar>
+                            <OverlayTrigger trigger="hover" key="right" placement="right"
+                                            overlay={
+                                                <Popover id={`popover-position-right`}
+                                                         title={`Hint`}>
+
+                                                    To make selection(s), either click on the checkbox or directly
+                                                    on the row.
+                                                </Popover>
+                                            }
+                            >
+
+                                <Button variant="light"> ? </Button>
+
+                            </OverlayTrigger>
+                        </ButtonToolbar>
+                    </Row>*/}
+                </Container>
 
                 {/*=============================== Grid Portion ===============================*/}
                 <Grid
