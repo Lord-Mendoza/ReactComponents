@@ -38,3 +38,25 @@ td.text-center.align-middle{
 .col-auto{
     flex: auto;
 }
+
+button#edit.btn.btn-link.dx-g-bs4-table-edit-command-cell{
+    background-image: url('edit.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+input.form-control.w-100{
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+td.text-center.p-0.text-nowrap{
+    vertical-align: middle;
+}
+
+th.position-relative.dx-g-bs4-header-cell.text-nowrap{
+    line-height: 1;
+}

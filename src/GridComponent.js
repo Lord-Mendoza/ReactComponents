@@ -11,6 +11,7 @@ import './GridComponent.css';
 
 //DevExpress Grid
 import {
+    EditingState,
     IntegratedPaging, IntegratedSelection,
     IntegratedSorting,
     PagingState,
@@ -20,18 +21,18 @@ import {
 import {
     Grid, PagingPanel, DragDropProvider,
     Table, TableColumnResizing,
-    TableHeaderRow, TableSelection, TableColumnReordering,
+    TableHeaderRow, TableSelection, TableColumnReordering, TableEditColumn, TableEditRow,
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 
 import {
-    Button,
+    Button, ButtonToolbar,
     Col,
     Container, Form,
-    Image,
+    OverlayTrigger, Popover,
     Row
 } from "react-bootstrap";
-import {FaPlus, FaRedo, FaSearch, FaSlidersH, FaSync} from "react-icons/fa";
+import {FaPlus, FaQuestion, FaRedo, FaSearch, FaSlidersH, FaSync, FaTrash} from "react-icons/fa";
 
 
 //======================================================================================================================
@@ -63,14 +64,21 @@ class GridComponent extends Component {
 
         //In-line grid methods declarations
         this.changeSorting = sorting => this.setState({sorting});
-        this.changeColumnWidths = (columnWidths) => {this.setState({columnWidths})};
+        this.changeColumnWidths = (columnWidths) => {
+            this.setState({columnWidths})
+        };
         this.changeCurrentPage = currentPage => this.setState({currentPage});
         this.changePageSize = pageSize => this.setState({pageSize});
-        this.changeSelection = selection => {this.setState({selection}, this.handleSelectedValues)};
-        this.changeColumnOrder = (newOrder) => {this.setState({columnOrder: newOrder})};
+        this.changeSelection = selection => {
+            this.setState({selection}, this.handleSelectedValues)
+        };
+        this.changeColumnOrder = (newOrder) => {
+            this.setState({columnOrder: newOrder})
+        };
 
         //Helper functions of this component
         this.handleSelectedValues = this.handleSelectedValues.bind(this);
+        this.changeEditState = this.changeEditState.bind(this);
     }
 
     //==================================================================================================================
@@ -128,17 +136,17 @@ class GridComponent extends Component {
         //Checking if the user opted to render a grid with a menu
         let viewSetup = "simple";
         if (viewConfig !== undefined) {
-            if (viewConfig === "search")
-                viewSetup = "search";
-            else if (viewConfig === "all")
-                viewSetup = "all";
+            if (viewConfig === "search" || viewConfig === "allnosearch" || viewConfig === "all")
+                viewSetup = viewConfig;
             else
                 viewSetup = "simple";
         }
 
+        let editingMode = false;
+
         this.setState({
             columns: gridColumns, rows: gridRows, columnOrder: columns, pageSize, pageSizes, selectionToggled,
-            viewSetup, columnWidths, columnReordering
+            viewSetup, columnWidths, columnReordering, editingMode
         });
     }
 
@@ -152,20 +160,34 @@ class GridComponent extends Component {
     //====================== HELPER FUNCTIONS FOR PASSING DATA TO PARENT COMPONENT =====================================
 
     handleSelectedValues() {
-        if (this.props.selectedValues !== undefined){
-            const {selection} = this.state;
+        if (this.props.selectedValues !== undefined) {
+            const {rows, selection} = this.state;
 
-            this.props.selectedValues(selection)
+            let selectedRows = selection.map(v => {
+                return rows[v];
+            });
+
+            this.props.selectedValues(selectedRows)
         }
+    }
+
+    changeEditState() {
+        const {viewSetup, editingMode} = this.state;
+
+        if (viewSetup === "all" || viewSetup === "allnosearch")
+            this.setState({editingMode: !editingMode});
     }
 
     //=========================================== RENDER ===============================================================
     render() {
+        //Retrieving all state values
         const {
             rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
-            selection, selectionToggled, viewSetup, columnReordering, columnOrder
+            selection, selectionToggled, viewSetup, columnReordering, columnOrder,
+            editingMode
         } = this.state;
 
+        //Enabling selection or not
         let selectionState;
         let integratedSelection;
         let tableSelection;
@@ -181,28 +203,68 @@ class GridComponent extends Component {
             />
         }
 
+        //Enabling column reordering or not
         let dragDropProvider;
         let tableColumnReordering;
-        if (columnReordering)
-        {
+        if (columnReordering) {
             dragDropProvider = <DragDropProvider/>;
             tableColumnReordering = <TableColumnReordering
-                                        order = {columnOrder}
-                                        onOrderChange={this.changeColumnOrder} />;
+                order={columnOrder}
+                onOrderChange={this.changeColumnOrder}/>;
         }
 
-
-        let menuOptions;
+        //Declaring the add button
         let btnAdd = <Button variant="success" style={{marginRight: 5, borderLeft: 0}}>
             <FaPlus/> Create Entry
         </Button>;
 
-        let btnEdit = <Button variant="info" style={{marginRight: 15, borderLeft: 0}}>
-            <FaSlidersH/> Show Edit/Delete
-        </Button>;
+        //Declaring the Show/Hide Edit/Delete button based on editing state
+        let btnEdit, options, multiSelect, deleteSelected, deleteHint;
+        if ((viewSetup === "all" || viewSetup === "allnosearch") && !editingMode) {
+            btnEdit = <Button variant="info" style={{marginRight: 15, borderLeft: 0}}
+                              onClick={this.changeEditState}>
+                <FaSlidersH/> Show Edit/Delete
+            </Button>;
+            options = <TableEditColumn width={0}/>;
+        } else if ((viewSetup === "all" || viewSetup === "allnosearch") && editingMode) {
+            btnEdit = <Button variant="info" style={{marginRight: 15, borderLeft: 0}}
+                              onClick={this.changeEditState}>
+                <FaSlidersH/> Hide Edit/Delete
+            </Button>;
 
+            options = <TableEditColumn showEditCommand/>;
+            multiSelect = <TableSelection selectByRowClick/>;
+
+            selectionState = <SelectionState
+                selection={selection}
+                onSelectionChange={this.changeSelection}
+            />;
+            integratedSelection = <IntegratedSelection/>;
+
+            deleteSelected = <Button variant="danger">
+                <FaTrash/> Delete Selected </Button>;
+            deleteHint = <ButtonToolbar>
+                <OverlayTrigger trigger="hover" key="right" placement="right"
+                                overlay={
+                                    <Popover id={`popover-position-right`}
+                                             title={`Hint`}>
+
+                                        To make selection(s), either click on the checkbox or directly
+                                        on the row.
+                                    </Popover>
+                                }
+                >
+
+                    <Button variant="light" style={{marginLeft: 5}}><FaQuestion/></Button>
+
+                </OverlayTrigger>
+            </ButtonToolbar>;
+        }
+
+        //Handling what appears in the menu bar based on viewConfig
+        let menuOptions;
         if (viewSetup !== "simple") {
-            if (viewSetup === "search"){
+            if (viewSetup === "search") {
                 menuOptions = <Form inline="true">
                     <Form.Group>
                         <Form.Control as="select"
@@ -218,8 +280,12 @@ class GridComponent extends Component {
                     <Button variant="outline-dark" style={{marginRight: 5}}> <FaSearch/> </Button>
                     <Button variant="outline-dark"> <FaRedo/> </Button>
                 </Form>;
-            }
-            else if (viewSetup === "all") {
+            } else if (viewSetup === "allnosearch"){
+                menuOptions = <Form inline="true">
+                        {btnAdd} {btnEdit}
+                </Form>;
+
+            } else if (viewSetup === "all") {
                 menuOptions = <Form inline="true">
                     <Form.Group>
                         {btnAdd} {btnEdit}
@@ -258,6 +324,10 @@ class GridComponent extends Component {
                             </Button>
                         </Col>
                     </Row>
+                    <Row noGutters={true} style={{paddingTop: 5}}>
+                        {deleteSelected}
+                        {deleteHint}
+                    </Row>
                 </Container>
 
                 {/*=============================== Grid Portion ===============================*/}
@@ -279,6 +349,8 @@ class GridComponent extends Component {
                         onPageSizeChange={this.changePageSize}
                     />
 
+                    <EditingState/>
+
                     {dragDropProvider}
                     <IntegratedPaging/>
                     {integratedSelection}
@@ -287,6 +359,10 @@ class GridComponent extends Component {
                     <Table
                         tableComponent={TableComponent}
                     />
+
+                    <TableEditRow/>
+                    {options}
+                    {multiSelect}
 
                     <TableColumnResizing
                         columnWidths={columnWidths}

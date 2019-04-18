@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './App.css';
-import {Button} from 'react-bootstrap';
 
 import GridComponent from "./GridComponent";
 
@@ -33,15 +32,7 @@ class App extends Component {
             data: sampleData(100)
         };
 
-        this.changeData = this.changeData.bind(this);
         this.handleSelectedValues = this.handleSelectedValues.bind(this);
-    }
-
-    changeData() {
-        if (this.state.change)
-            this.setState({change: false, labels: labels2, data: data2});
-        else
-            this.setState({change: true, labels: labels1, data: data1});
     }
 
     handleSelectedValues(values) {
@@ -51,17 +42,9 @@ class App extends Component {
     render() {
         return (
             <div>
-                {/*<Button variant="danger" onClick={this.changeData}>
-                    Switch
-                </Button>*/}
-
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
-                               pageConfig={[10, [10, 50, 100]]}
-                               colReorder={false}
-                               toggleSelect={false}
-                               selectedValues={this.handleSelectedValues}
-                               viewConfig="simple"
+                               viewConfig="allnosearch"
                 />
             </div>
         );
