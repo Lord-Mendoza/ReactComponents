@@ -69,10 +69,13 @@ import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 import {
     Button,
     Col,
-    Container,
+    Container, Form,
     Image,
     Row
 } from "react-bootstrap";
+import {FaPlus, FaRedo, FaSearch, FaSlidersH, FaSync} from "react-icons/fa";
+
+
 //======================================================================================================================
 //================================= GLOBAL VARIABLES FOR GRID CONFIGURATION ============================================
 
@@ -235,19 +238,30 @@ class GridComponent extends Component {
 
         let gridOptions;
         if (!isViewOnly){
-            let btnAdd = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                    <Image src='./add.png'/> Create
+            let btnAdd = <Button variant="success" style ={{marginRight: 5, borderLeft: 0}}>
+                    <FaPlus/> Create Entry
                 </Button>;
 
-            let btnEdit = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                    <Image src='./edit.png'/> Edit
+            let btnEdit = <Button variant="secondary" style ={{marginRight: 15, borderLeft: 0}}>
+                        <FaSlidersH/> Show Edit/Delete
                 </Button>;
 
-            let btnDelete = <Button variant="light" style ={{marginRight: 5, borderLeft: 0}}>
-                    <Image src='./reject.png'/> Delete
-                </Button>;
+            gridOptions = <Form inline="true">
+                <Form.Group>
+                    {btnAdd} {btnEdit}
 
-            gridOptions = (<Col>{btnAdd} {btnEdit} {btnDelete}</Col>)
+                    <Form.Control as="select"
+                                  value="default"
+                                  style={{fontSize: 12, marginRight: 5}}>
+                        <option disabled value = {"default"} key={0}>Select Column...</option>
+                    </Form.Control>
+
+                    <Form.Control style={{fontSize: 12, marginRight: 5}} type="text" placeholder="Search Value" />
+                </Form.Group>
+
+                <Button variant="outline-dark" style={{marginRight: 5}}> <FaSearch/> </Button>
+                <Button variant="outline-dark"> <FaRedo/> </Button>
+            </Form>;
         }
 
 
@@ -258,11 +272,11 @@ class GridComponent extends Component {
 
                 <Container fluid={true} style={{marginRight: 1}}>
                     <Row noGutters={true}>
-                        {gridOptions}
+                        <Col>{gridOptions}</Col>
 
-                        <Col style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
-                            <Button variant="light">
-                                <Image src='./reset.png'/> Refresh
+                        <Col xs ="auto" style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
+                            <Button variant="primary">
+                                <FaSync/> Refresh
                             </Button>
                         </Col>
                     </Row>
