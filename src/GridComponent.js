@@ -104,7 +104,9 @@ class GridComponent extends Component {
         };
 
         this.changeSorting = sorting => this.setState({sorting});
-        this.changeColumnWidths = (columnWidths) => {this.setState({columnWidths})};
+        this.changeColumnWidths = (columnWidths) => {
+            this.setState({columnWidths})
+        };
         this.changeCurrentPage = currentPage => this.setState({currentPage});
         this.changePageSize = pageSize => this.setState({pageSize});
         this.changeSelection = selection => this.setState({selection});
@@ -151,7 +153,7 @@ class GridComponent extends Component {
             if (toggleSelect)
                 selectionToggled = toggleSelect;
         }
-        
+
         //Setting up widths for viewing
         let columnWidths = columns.map(v => {
             return {columnName: v.replace(/\s/g, ""), width: 180};
@@ -163,8 +165,10 @@ class GridComponent extends Component {
             isViewOnly = this.props.viewOnly;
         }
 
-        this.setState({columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled,
-            isViewOnly, columnWidths});
+        this.setState({
+            columns: gridColumns, rows: gridRows, pageSize, pageSizes, selectionToggled,
+            isViewOnly, columnWidths
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -218,8 +222,10 @@ class GridComponent extends Component {
 
     //=========================================== RENDER ===============================================================
     render() {
-        const {rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
-            selection, selectionToggled, isViewOnly} = this.state;
+        const {
+            rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
+            selection, selectionToggled, isViewOnly
+        } = this.state;
 
         let selectionState;
         let integratedSelection;
@@ -229,39 +235,23 @@ class GridComponent extends Component {
                 selection={selection}
                 onSelectionChange={this.changeSelection}
             />;
-            integratedSelection = <IntegratedSelection />;
+            integratedSelection = <IntegratedSelection/>;
             tableSelection = <TableSelection
                 selectByRowClick
                 showSelectAll
             />
         }
 
-        let gridOptions;
-        if (!isViewOnly){
-            let btnAdd = <Button variant="success" style ={{marginRight: 5, borderLeft: 0}}>
-                    <FaPlus/> Create Entry
-                </Button>;
+        let btnAdd;
+        let btnEdit;
+        if (!isViewOnly) {
+            btnAdd = <Button variant="success" style={{marginRight: 5, borderLeft: 0}}>
+                <FaPlus/> Create Entry
+            </Button>;
 
-            let btnEdit = <Button variant="secondary" style ={{marginRight: 15, borderLeft: 0}}>
-                        <FaSlidersH/> Show Edit/Delete
-                </Button>;
-
-            gridOptions = <Form inline="true">
-                <Form.Group>
-                    {btnAdd} {btnEdit}
-
-                    <Form.Control as="select"
-                                  value="default"
-                                  style={{fontSize: 12, marginRight: 5}}>
-                        <option disabled value = {"default"} key={0}>Select Column...</option>
-                    </Form.Control>
-
-                    <Form.Control style={{fontSize: 12, marginRight: 5}} type="text" placeholder="Search Value" />
-                </Form.Group>
-
-                <Button variant="outline-dark" style={{marginRight: 5}}> <FaSearch/> </Button>
-                <Button variant="outline-dark"> <FaRedo/> </Button>
-            </Form>;
+            btnEdit = <Button variant="info" style={{marginRight: 15, borderLeft: 0}}>
+                <FaSlidersH/> Show Edit/Delete
+            </Button>;
         }
 
 
@@ -272,9 +262,27 @@ class GridComponent extends Component {
 
                 <Container fluid={true} style={{marginRight: 1}}>
                     <Row noGutters={true}>
-                        <Col>{gridOptions}</Col>
+                        <Col>
+                            <Form inline="true">
+                                <Form.Group>
+                                    {btnAdd} {btnEdit}
 
-                        <Col xs ="auto" style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
+                                    <Form.Control as="select"
+                                                  value="default"
+                                                  style={{fontSize: 12, marginRight: 5}}>
+                                        <option disabled value={"default"} key={0}>Select Column...</option>
+                                    </Form.Control>
+
+                                    <Form.Control style={{fontSize: 12, marginRight: 5}} type="text"
+                                                  placeholder="Search Value"/>
+                                </Form.Group>
+
+                                <Button variant="outline-dark" style={{marginRight: 5}}> <FaSearch/> </Button>
+                                <Button variant="outline-dark"> <FaRedo/> </Button>
+                            </Form>
+                        </Col>
+
+                        <Col xs="auto" style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
                             <Button variant="primary">
                                 <FaSync/> Refresh
                             </Button>
