@@ -24,19 +24,17 @@ const sampleData = (len) => {
     return retVal;
 };
 
-const pageSizing = [10, [10, 50, 100]];
-
 class App extends Component {
     constructor(props){
         super(props);
 
         this.state = {
             labels: labels2,
-            data: sampleData(100),
-            pageSizing: pageSizing
+            data: sampleData(100)
         };
 
         this.changeData = this.changeData.bind(this);
+        this.handleSelectedValues = this.handleSelectedValues.bind(this);
     }
 
     changeData() {
@@ -44,6 +42,10 @@ class App extends Component {
             this.setState({change: false, labels: labels2, data: data2});
         else
             this.setState({change: true, labels: labels1, data: data1});
+    }
+
+    handleSelectedValues(values) {
+        this.setState({selectedValues: values});
     }
 
     render() {
@@ -55,9 +57,11 @@ class App extends Component {
 
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
-                               pageSizing={this.state.pageSizing}
+                               pageConfig={[10, [10, 50, 100]]}
+                               colReorder={false}
                                toggleSelect={false}
-                               viewOnly={false}
+                               selectedValues={this.handleSelectedValues}
+                               viewConfig="simple"
                 />
             </div>
         );
