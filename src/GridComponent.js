@@ -72,13 +72,24 @@ class GridComponent extends Component {
         this.changeSelection = selection => {
             this.setState({selection}, this.handleSelectedValues)
         };
+        this.changeDeletionSelection = selection => {
+            this.setState({deletionSelection: selection})
+        };
         this.changeColumnOrder = (newOrder) => {
             this.setState({columnOrder: newOrder})
+        };
+        this.changeEditingRowIds = (editingRowIds) => {
+            this.setState({editingRowIds});
+        };
+        this.changeRowChanges = (rowChanges) => {
+            this.setState({rowChanges});
         };
 
         //Helper functions of this component
         this.handleSelectedValues = this.handleSelectedValues.bind(this);
         this.changeEditState = this.changeEditState.bind(this);
+        this.deleteSelected = this.deleteSelected.bind(this);
+        this.commitChanges = this.commitChanges.bind(this);
     }
 
     //==================================================================================================================
@@ -167,7 +178,7 @@ class GridComponent extends Component {
                 return rows[v];
             });
 
-            this.props.selectedValues(selectedRows)
+            this.props.selectedValues(selectedRows);
         }
     }
 
@@ -178,20 +189,60 @@ class GridComponent extends Component {
             this.setState({editingMode: !editingMode});
     }
 
+    deleteSelected() {
+        if (this.props.deletedValues !== undefined) {
+            const {rows, deletionSelection} = this.state;
+
+            let deletedRows = deletionSelection.map(v => {
+                return rows[v];
+            });
+
+            this.props.deletedValues(deletedRows)
+
+            this.setState({deletionSelection: []})
+        }
+    }
+
+    /*
+    At the moment, commit changes gets called each time "save" is pressed, and it will pass an array containing:
+    [ [row that was changed], [changes to that row] ]
+
+    When the next changes are made, commitchanges gets called again and the previous value gets overwritten
+    */
+    commitChanges({changed}) {
+        const {rows, rowChanges} = this.state;
+
+        if (changed && rowChanges.length !== 0){
+            let submittedChanges = [];
+
+            for (let prop in rowChanges){
+                if (rowChanges.hasOwnProperty(prop)){
+                    let rowChanged = [rows[prop]];
+                    rowChanged.push(rowChanges[prop]);
+                    submittedChanges.push(rowChanged);
+                }
+            }
+
+            if (this.props.editedValues !== undefined)
+                this.props.editedValues(submittedChanges);
+        }
+    }
+
     //=========================================== RENDER ===============================================================
     render() {
         //Retrieving all state values
         const {
             rows, columns, sorting, columnWidths, pageSize, pageSizes, currentPage,
             selection, selectionToggled, viewSetup, columnReordering, columnOrder,
-            editingMode
+            editingMode, deletionSelection
         } = this.state;
 
         //Enabling selection or not
         let selectionState;
         let integratedSelection;
         let tableSelection;
-        if (selectionToggled && this.props.selectedValues !== undefined) {
+        if (selectionToggled && this.props.selectedValues !== undefined &&
+                                        (viewSetup === "simple" || viewSetup === "search")) {
             selectionState = <SelectionState
                 selection={selection}
                 onSelectionChange={this.changeSelection}
@@ -199,8 +250,7 @@ class GridComponent extends Component {
             integratedSelection = <IntegratedSelection/>;
             tableSelection = <TableSelection
                 selectByRowClick
-                showSelectAll
-            />
+            />;
         }
 
         //Enabling column reordering or not
@@ -236,12 +286,12 @@ class GridComponent extends Component {
             multiSelect = <TableSelection selectByRowClick/>;
 
             selectionState = <SelectionState
-                selection={selection}
-                onSelectionChange={this.changeSelection}
+                selection={deletionSelection}
+                onSelectionChange={this.changeDeletionSelection}
             />;
             integratedSelection = <IntegratedSelection/>;
 
-            deleteSelected = <Button variant="danger">
+            deleteSelected = <Button variant="danger" onClick={this.deleteSelected}>
                 <FaTrash/> Delete Selected </Button>;
             deleteHint = <ButtonToolbar>
                 <OverlayTrigger trigger="hover" key="right" placement="right"
@@ -335,11 +385,18 @@ class GridComponent extends Component {
                     rows={rows}
                     columns={columns}
                 >
-                    {selectionState}
-
                     <SortingState
                         sorting={sorting}
                         onSortingChange={this.changeSorting}
+                    />
+
+                    <EditingState
+                        editingRowIds={this.state.editingRowIds}
+                        onEditingRowIdsChange={this.changeEditingRowIds}
+                        rowChanges={this.state.rowChanges}
+                        onRowChangesChange={this.changeRowChanges}
+
+                        onCommitChanges={this.commitChanges}
                     />
 
                     <PagingState
@@ -349,29 +406,29 @@ class GridComponent extends Component {
                         onPageSizeChange={this.changePageSize}
                     />
 
-                    <EditingState/>
-
+                    {selectionState}
                     {dragDropProvider}
-                    <IntegratedPaging/>
+
                     {integratedSelection}
+                    <IntegratedPaging/>
 
                     <IntegratedSorting/>
                     <Table
                         tableComponent={TableComponent}
                     />
 
-                    <TableEditRow/>
-                    {options}
-                    {multiSelect}
-
                     <TableColumnResizing
                         columnWidths={columnWidths}
                         onColumnWidthsChange={this.changeColumnWidths}
                     />
 
+                    <TableHeaderRow showSortingControls/>
+                    <TableEditRow/>
+                    {options}
+                    {multiSelect}
+
                     {tableColumnReordering}
 
-                    <TableHeaderRow showSortingControls/>
                     {tableSelection}
 
                     <PagingPanel

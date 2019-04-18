@@ -33,10 +33,20 @@ class App extends Component {
         };
 
         this.handleSelectedValues = this.handleSelectedValues.bind(this);
+        this.handleDeletedValues = this.handleDeletedValues.bind(this);
+        this.handleEditedVales = this.handleEditedVales.bind(this);
     }
 
     handleSelectedValues(values) {
         this.setState({selectedValues: values});
+    }
+
+    handleDeletedValues(values){
+        this.setState({deletedValues: values});
+    }
+
+    handleEditedVales(values){
+        this.setState({editedValues: values});
     }
 
     render() {
@@ -44,7 +54,11 @@ class App extends Component {
             <div>
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
-                               viewConfig="allnosearch"
+                               toggleSelect={true}
+                               selectedValues={this.handleSelectedValues}
+                               viewConfig="all"
+                               deletedValues={this.handleDeletedValues}
+                               editedValues={this.handleEditedVales}
                 />
             </div>
         );
