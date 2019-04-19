@@ -79,10 +79,14 @@ class GridComponent extends Component {
             this.setState({columnOrder: newOrder})
         };
         this.changeEditingRowIds = (editingRowIds) => {
-            this.setState({editingRowIds});
+            if (this.state.editingRowIds.length < 1)
+                this.setState({editingRowIds});
         };
         this.changeRowChanges = (rowChanges) => {
-            this.setState({rowChanges});
+            if (this.state.editingRowIds.length === 1 && Object.keys(rowChanges).length === 0)
+                this.setState({editingRowIds: [], rowChanges});
+            else
+                this.setState({rowChanges});
         };
 
         //Helper functions of this component
@@ -157,7 +161,8 @@ class GridComponent extends Component {
 
         this.setState({
             columns: gridColumns, rows: gridRows, columnOrder: columns, pageSize, pageSizes, selectionToggled,
-            viewSetup, columnWidths, columnReordering, editingMode
+            viewSetup, columnWidths, columnReordering, editingMode, deletionSelection: [], editingRowIds: [],
+            rowChanges: []
         });
     }
 
@@ -207,7 +212,7 @@ class GridComponent extends Component {
     At the moment, commit changes gets called each time "save" is pressed, and it will pass an array containing:
     [ [row that was changed], [changes to that row] ]
 
-    When the next changes are made, commitchanges gets called again and the previous value gets overwritten
+    When the next changes are made, commit changes gets called again and the previous value gets overwritten
     */
     commitChanges({changed}) {
         const {rows, rowChanges} = this.state;
@@ -223,7 +228,7 @@ class GridComponent extends Component {
                 }
             }
 
-            if (this.props.editedValues !== undefined)
+            if (this.props.editedValues !== undefined && Object.keys(rowChanges).length !== 0)
                 this.props.editedValues(submittedChanges);
         }
     }
