@@ -486,12 +486,13 @@ class GridComponent extends Component {
 
         //Configuring which paging setup to use
         let pagingPlugin;
-        console.log(remotePagingToggled);
         if (this.props.remotePaging !== undefined) {
             if (this.props.remotePaging)
                 pagingPlugin = <CustomPaging
                     totalCount={totalDataCount}
                 />;
+            else
+                pagingPlugin = <IntegratedPaging/>;
         }
         else{
             pagingPlugin = <IntegratedPaging/>;
