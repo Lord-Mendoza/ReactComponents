@@ -29,24 +29,22 @@ class App extends Component {
 
         this.state = {
             labels: labels2,
-            data: sampleData(100)
+            data: sampleData(100),
+            blockedColumns: ["Color"],
+            blockedSearchColumns: ["Color"],
+            currentPage: 0,
+            currentPageSize: 10,
+            totalDataCount: 100
         };
 
-        this.handleSelectedValues = this.handleSelectedValues.bind(this);
-        this.handleDeletedValues = this.handleDeletedValues.bind(this);
-        this.handleEditedVales = this.handleEditedVales.bind(this);
-    }
-
-    handleSelectedValues(values) {
-        this.setState({selectedValues: values});
-    }
-
-    handleDeletedValues(values){
-        this.setState({deletedValues: values});
-    }
-
-    handleEditedVales(values){
-        this.setState({editedValues: values});
+        this.handleSelectedValues = (values) => {this.setState({selectedValues: values})};
+        this.handleDeletedValues = (values) => {this.setState({deletedValues: values})};
+        this.handleEditedVales = (values) => {this.setState({editedValues: values})};
+        this.handleSearchValues = (values) => {this.setState({searchValues: values})};
+        this.handlePageChange = (value) => {this.setState({currentPage: value})};
+        this.handlePageSizeChange = (value) => {this.setState({currentPageSize: value})};
+        this.handleRefresh = () => {alert("refresh triggered!")};
+        this.handleCreate = () => {alert("create triggered!")};
     }
 
     render() {
@@ -54,11 +52,26 @@ class App extends Component {
             <div>
                 <GridComponent columns={this.state.labels}
                                rows={this.state.data}
+
                                toggleSelect={true}
                                selectedValues={this.handleSelectedValues}
-                               viewConfig="all"
+
+                               viewConfig="bare"
+
+                               blockedColumns={this.state.blockedColumns}
+                               blockedSearchColumns={this.state.blockedSearchColumns}
+
+                               remotePaging={false}
+                               totalCount={this.state.totalDataCount}
+                               currentPage={this.handlePageChange}
+                               currentPageSize={this.handlePageSizeChange}
+
+                               searchValue={this.handleSearchValues}
+
                                deletedValues={this.handleDeletedValues}
                                editedValues={this.handleEditedVales}
+                               refreshToggled={this.handleRefresh}
+                               createToggled={this.handleCreate}
                 />
             </div>
         );
