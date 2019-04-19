@@ -1,5 +1,5 @@
 /*
-Lord Mendoza - 4/16/19
+Lord Mendoza - 4/19/19
 
 */
 //======================================================================================================================
@@ -26,6 +26,7 @@ import {
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 
+//React-Bootstrap
 import {
     Button, ButtonToolbar,
     Col,
@@ -37,7 +38,7 @@ import {FaPlus, FaQuestion, FaRedo, FaSearch, FaSlidersH, FaSync, FaTrash} from 
 
 
 //======================================================================================================================
-//================================= GLOBAL VARIABLES FOR GRID CONFIGURATION ============================================
+//================================= GLOBAL VARIABLE FOR GRID CONFIGURATION =============================================
 
 const TableComponent = ({...restProps}) => (
     <Table.Table
@@ -53,22 +54,30 @@ class GridComponent extends Component {
     constructor(props, context) {
         super(props, context);
 
+        //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
+            //Required for rendering data in the grid
             columns: [],
             rows: [],
+
+            //Custom Configurations
             columnLabels: [],
             columnWidths: [],
             pageSize: 10,
             pageSizes: [10, 50, 100],
             currentPage: 0,
+
+            //For passing back the selected values to parent component
             selection: [],
+
+            //For customizing the search components as well as sending that data back to parent component
             editingStateColumnExtensions: [],
             nonSearchableColumns: [],
             searchValue: "",
             searchColumn: "default",
         };
 
-        //In-line grid methods declarations
+        //In-line methods that is better to be declared here rather than outside the constructor (since its simple)
         this.changeSorting = sorting => this.setState({sorting});
         this.changeColumnWidths = (columnWidths) => {
             this.setState({columnWidths})
@@ -102,7 +111,7 @@ class GridComponent extends Component {
             this.setState({searchValue: "", searchColumn: "default"})
         };
 
-        //Helper functions of this component
+        //Helper functions of this component that are more complicated to declare inside the constructor
         this.handleSelectedValues = this.handleSelectedValues.bind(this);
         this.changeEditState = this.changeEditState.bind(this);
         this.deleteSelected = this.deleteSelected.bind(this);
@@ -117,21 +126,25 @@ class GridComponent extends Component {
     //==================================================================================================================
     //================================== REACT STATE COMPONENTS ========================================================
 
+    /*
+    When the GridComponent mounts in the React app, then this gets called to initialize the GridComponent's state based
+    on the values passed in through props.
+     */
     componentDidMount() {
         const {
             columns, rows, pageConfig, toggleSelect, viewConfig, colReorder, blockedColumns,
             blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount
         } = this.props;
 
-        //Setting up the columns
+        //Setting up the columns for rendering
         let gridColumns = columns.map(v => {
             return {name: v.replace(/\s/g, ""), title: v};
         });
 
-        //Setting up column labels
+        //Setting up column labels to be used later by search component
         let columnLabels = columns;
 
-        //Setting up the rows
+        //Setting up the rows (data)
         let gridRows = [];
         rows.forEach(v => {
             let gridRow = {};
@@ -145,7 +158,8 @@ class GridComponent extends Component {
             gridRows.push(gridRow);
         });
 
-        //Setting up the page sizes for paging
+        //Setting up the page sizes if the developer provides such information, but assigning default values should
+        //they choose to omit it.
         let pageSize = 10;
         let pageSizes = [10, 50, 100];
         if (pageConfig !== undefined) {
@@ -155,24 +169,25 @@ class GridComponent extends Component {
             }
         }
 
-        //Setting up selection state if its enabled or not
+        //Setting up selection state depending on if its enabled or not
         let selectionToggled = false;
         if (toggleSelect !== undefined) {
             if (toggleSelect)
                 selectionToggled = toggleSelect;
         }
 
-        //Setting up widths for viewing
+        //Setting up initial widths for viewing
         let columnWidths = columns.map(v => {
             return {columnName: v.replace(/\s/g, ""), width: 180};
         });
 
-        //Checking if the user opted to allow column reordering
+        //Checking if the developer opted to allow column reordering
         let columnReordering = false;
         if (colReorder)
             columnReordering = true;
 
-        //Checking if the user opted to render a grid with a menu
+        //Checking which viewSetup the developer went with. Consult the wiki for more details on the individual
+        //options.
         let viewSetup = "simple";
         if (viewConfig !== undefined) {
             if (viewConfig === "search" || viewConfig === "allnosearch" || viewConfig === "all"
@@ -182,7 +197,7 @@ class GridComponent extends Component {
                 viewSetup = "simple";
         }
 
-        //Configuring certain columns to not be editable as applicable
+        //Configuring certain columns to not be editable based on the developer's choice.
         let nonEditableColumns = [];
         if (blockedColumns !== undefined) {
             if (blockedColumns.length > 0) {
@@ -192,7 +207,7 @@ class GridComponent extends Component {
             }
         }
 
-        //Configuring certain columns to not be searchable as applicable
+        //Configuring certain columns to not be searchable based on the developer's choice.
         let nonSearchableColumns = [];
         if (blockedSearchColumns !== undefined) {
             if (blockedSearchColumns.length > 0) {
@@ -200,7 +215,7 @@ class GridComponent extends Component {
             }
         }
 
-        //Checking if remote paging is toggled
+        //Checking if remote paging is toggled; else the integrated paging is performed
         let remotePagingToggled = false;
         let totalDataCount = 0;
         if (remotePaging !== undefined && currentPageSize !== undefined && currentPage !== undefined
@@ -215,22 +230,168 @@ class GridComponent extends Component {
         let searchColumn = "default";
 
         this.setState({
-            columns: gridColumns, rows: gridRows, columnLabels, columnOrder: columns, pageSize, pageSizes,
-            selectionToggled, viewSetup, columnWidths, columnReordering, editingMode, deletionSelection: [],
-            editingRowIds: [], rowChanges: [], editingStateColumnExtensions: nonEditableColumns, nonSearchableColumns,
-            searchValue, searchColumn, remotePagingToggled, totalDataCount
+            //Required values for rendering the grid
+            columns: gridColumns, rows: gridRows,
+
+            //Additional grid configurations
+            columnLabels, columnOrder: columns,
+            columnWidths, columnReordering, editingMode,
+            pageSize, pageSizes,
+            selectionToggled,
+
+            //Tracking which grid view the developer opted for
+            viewSetup,
+
+            //Tracking which rows are deleted/edited/search to be passed back to parent component
+            deletionSelection: [], editingRowIds: [], rowChanges: [],
+            searchValue, searchColumn,
+
+            //Configuring the search component
+            editingStateColumnExtensions: nonEditableColumns, nonSearchableColumns,
+
+            //Remote paging configuration
+            remotePagingToggled, totalDataCount,
         });
     }
 
+    /*
+    If changes occur in the parent component involving the required sections of the grid
+    (new data is loaded, new columns) then the GridComponent's state is re-initialized again
+     */
     componentDidUpdate(prevProps) {
         if (this.props.columns !== prevProps.columns || this.props.rows !== prevProps.rows) {
+            const {
+                columns, rows, pageConfig, toggleSelect, viewConfig, colReorder, blockedColumns,
+                blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount
+            } = this.props;
 
+            //Setting up the columns for rendering
+            let gridColumns = columns.map(v => {
+                return {name: v.replace(/\s/g, ""), title: v};
+            });
+
+            //Setting up column labels to be used later by search component
+            let columnLabels = columns;
+
+            //Setting up the rows (data)
+            let gridRows = [];
+            rows.forEach(v => {
+                let gridRow = {};
+
+                columns.forEach(p => {
+                    if (v.hasOwnProperty(p)) {
+                        gridRow[p.replace(/\s/g, "")] = v[p];
+                    }
+                });
+
+                gridRows.push(gridRow);
+            });
+
+            //Setting up the page sizes if the developer provides such information, but assigning default values should
+            //they choose to omit it.
+            let pageSize = 10;
+            let pageSizes = [10, 50, 100];
+            if (pageConfig !== undefined) {
+                if (pageConfig.length === 2) {
+                    pageSize = pageConfig[0];
+                    pageSizes = pageConfig[1];
+                }
+            }
+
+            //Setting up selection state depending on if its enabled or not
+            let selectionToggled = false;
+            if (toggleSelect !== undefined) {
+                if (toggleSelect)
+                    selectionToggled = toggleSelect;
+            }
+
+            //Setting up initial widths for viewing
+            let columnWidths = columns.map(v => {
+                return {columnName: v.replace(/\s/g, ""), width: 180};
+            });
+
+            //Checking if the developer opted to allow column reordering
+            let columnReordering = false;
+            if (colReorder)
+                columnReordering = true;
+
+            //Checking which viewSetup the developer went with. Consult the wiki for more details on the individual
+            //options.
+            let viewSetup = "simple";
+            if (viewConfig !== undefined) {
+                if (viewConfig === "search" || viewConfig === "allnosearch" || viewConfig === "all"
+                    || viewConfig === "bare")
+                    viewSetup = viewConfig;
+                else
+                    viewSetup = "simple";
+            }
+
+            //Configuring certain columns to not be editable based on the developer's choice.
+            let nonEditableColumns = [];
+            if (blockedColumns !== undefined) {
+                if (blockedColumns.length > 0) {
+                    blockedColumns.forEach(v => {
+                        nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
+                    });
+                }
+            }
+
+            //Configuring certain columns to not be searchable based on the developer's choice.
+            let nonSearchableColumns = [];
+            if (blockedSearchColumns !== undefined) {
+                if (blockedSearchColumns.length > 0) {
+                    nonSearchableColumns = blockedSearchColumns;
+                }
+            }
+
+            //Checking if remote paging is toggled; else the integrated paging is performed
+            let remotePagingToggled = false;
+            let totalDataCount = 0;
+            if (remotePaging !== undefined && currentPageSize !== undefined && currentPage !== undefined
+                && totalCount !== undefined) {
+                remotePagingToggled = remotePaging;
+                totalDataCount = totalCount;
+            }
+
+            //Initializing other state props
+            let editingMode = false;
+            let searchValue = "";
+            let searchColumn = "default";
+
+            this.setState({
+                //Required values for rendering the grid
+                columns: gridColumns, rows: gridRows,
+
+                //Additional grid configurations
+                columnLabels, columnOrder: columns,
+                columnWidths, columnReordering, editingMode,
+                pageSize, pageSizes,
+                selectionToggled,
+
+                //Tracking which grid view the developer opted for
+                viewSetup,
+
+                //Tracking which rows are deleted/edited/search to be passed back to parent component
+                deletionSelection: [], editingRowIds: [], rowChanges: [],
+                searchValue, searchColumn,
+
+                //Configuring the search component
+                editingStateColumnExtensions: nonEditableColumns, nonSearchableColumns,
+
+                //Remote paging configuration
+                remotePagingToggled, totalDataCount,
+            });
         }
     }
 
     //==================================================================================================================
     //====================== HELPER FUNCTIONS FOR PASSING DATA TO PARENT COMPONENT =====================================
 
+    /*
+    Grabs the selected values and uses the callback function in parent component to pass said data.
+
+    Invoked only when selectedValues prop is set to true
+     */
     handleSelectedValues() {
         if (this.props.selectedValues !== undefined) {
             const {rows, selection} = this.state;
@@ -243,6 +404,12 @@ class GridComponent extends Component {
         }
     }
 
+    /*
+    Flipping the "edit mode" state which renders a different grid configuration than default
+
+    Invoked only when viewSetup is set to "all" / "allnosearch" since they provide the buttons for
+    editing/deleting
+     */
     changeEditState() {
         const {viewSetup, editingMode} = this.state;
 
@@ -250,6 +417,12 @@ class GridComponent extends Component {
             this.setState({editingMode: !editingMode});
     }
 
+    /*
+    Passing the deleted rows back to parent component for performing the actual deletion. It will also
+    clear the selection for next use.
+
+    Invoked only when viewSetup is set to "all" / "allnosearch" since they provide the buttons for deleting.
+     */
     deleteSelected() {
         if (this.props.deletedValues !== undefined) {
             const {rows, deletionSelection} = this.state;
@@ -265,10 +438,19 @@ class GridComponent extends Component {
     }
 
     /*
-    At the moment, commit changes gets called each time "save" is pressed, and it will pass an array containing:
-    [ [row that was changed], [changes to that row] ]
+    Passing the row that was changed as well as the changes made in a single array back to the parent
+    component. It's sent back in the form:
+        [ {the row that was edited, as passed in the "rows" prop} , {the changes made to that row} ]
 
-    When the next changes are made, commit changes gets called again and the previous value gets overwritten
+    Ex. Let's say in the parent component we did something like:
+        <GridComponent columns={["Name", "Age"]}
+                       rows={ [ {Name: "Lord", Age: "24"}, {Name: "Daniel", Age: "23"} ] }
+                       ... />
+        If the first row (Lord, 24) was changed with the name changing to "Matt", then the data will be
+        passed in like
+
+                  row changed           changes
+        [ {Name: "Lord", Age: "24"}, {Name: "Matt} ]
     */
     commitChanges({changed}) {
         const {rows, rowChanges} = this.state;
@@ -289,12 +471,27 @@ class GridComponent extends Component {
         }
     }
 
+    /*
+    Triggering the callback for clicking the refresh button.
+
+    Note that GridComponent will NOT handle your data for you. When this method is invoked it
+    gives you a hint that the user wants to reload the data; therefore you must look into
+    updating the data passed in for "rows" prop.
+    */
     performRefresh() {
         if (this.props.refreshToggled !== undefined) {
             this.props.refreshToggled();
         }
     }
 
+    /*
+    Passing the search values to the parent component. Comes as a JSON object like:
+    { searchColumn: searchValue }
+
+    Ex. Let's say the user chose to search by column "Name" and their search value is "Lord". Then the
+    return value is:
+    { "Name": "Lord }
+    */
     performSearch() {
         if (this.props.searchValue !== undefined) {
             const {searchValue, searchColumn} = this.state;
@@ -307,12 +504,23 @@ class GridComponent extends Component {
         }
     }
 
+    /*
+    Triggering the callback for clicking the create button.
+
+    Note that GridComponent will NOT handle the data creation. You can choose to handle this creation phase as
+    you desire, whether you'll respond with a modal that includes the form or however else you wish.
+    */
     createEntry() {
         if (this.props.createToggled !== undefined) {
             this.props.createToggled();
         }
     }
 
+    /*
+    Changes the page based on user interaction
+
+    If remotePaging is toggled to true, then the current page value is sent back to the parent prop.
+    */
     changeCurrentPage = currentPage => {
         if (this.state.remotePagingToggled)
             this.setState({currentPage}, this.props.currentPage(currentPage));
@@ -321,6 +529,11 @@ class GridComponent extends Component {
 
     };
 
+    /*
+    Changes the page size based on user interaction
+
+    If remotePaging is toggled to true, then the current page size value is sent back to the parent prop.
+    */
     changePageSize = pageSize => {
         if (this.state.remotePagingToggled)
             this.setState({pageSize}, this.props.currentPageSize(pageSize));
@@ -334,15 +547,18 @@ class GridComponent extends Component {
         const {
             rows, columns, columnLabels, sorting, columnWidths, pageSize, pageSizes, currentPage,
             selection, selectionToggled, viewSetup, columnReordering, columnOrder, editingMode,
-            deletionSelection, nonSearchableColumns, remotePagingToggled, totalDataCount
+            deletionSelection, nonSearchableColumns, totalDataCount
         } = this.state;
 
-        //Enabling selection or not
+        //Determining whether to display the select checkboxes to the left of the rows or not
+        //Note that this checks if the viewSetup is set to bare, simple, or search. If its neither
+        //of those three, then this won't be rendered (since checkboxes will appear already for
+        //delete/edit mode)
         let selectionState;
         let integratedSelection;
         let tableSelection;
         if (selectionToggled && this.props.selectedValues !== undefined &&
-            (viewSetup === "simple" || viewSetup === "search")) {
+            (viewSetup === "simple" || viewSetup === "search" || viewSetup === "bare")) {
             selectionState = <SelectionState
                 selection={selection}
                 onSelectionChange={this.changeSelection}
@@ -412,7 +628,7 @@ class GridComponent extends Component {
             </ButtonToolbar>;
         }
 
-        //Declaring the refresh button
+        //Declaring the refresh button; note that it checks if the viewSetup is bare & avoids rendering if so.
         let refresh;
         if (viewSetup !== "bare")
             refresh = <Button variant="primary" onClick={this.performRefresh}>
@@ -421,13 +637,18 @@ class GridComponent extends Component {
 
         //Handling what appears in the menu bar based on viewConfig
         let menuOptions;
+        let count = 0;
         let searchColumns = [<option disabled value={"default"} key={0}>Select Column...</option>];
         columnLabels.filter(v => (!nonSearchableColumns.includes(v)))
             .forEach(v => {
-                searchColumns.push(<option value={v}> {v} </option>);
+                searchColumns.push(<option value={v} key={count+1}> {v} </option>);
+                count++;
             });
 
+        //If simple is selected, then nothing else but the grid, pagination/page sizing & refresh buttons will appear.
         if (viewSetup !== "simple") {
+
+            //Else if search is selected, then all of the above + search components will appear
             if (viewSetup === "search") {
                 menuOptions = <Form inline="true">
                     <Form.Group>
@@ -451,11 +672,14 @@ class GridComponent extends Component {
                     <Button variant="outline-dark"
                             onClick={this.resetSearch}> <FaRedo/> </Button>
                 </Form>;
+
+            //Else if search components are not toggled, then they will be hidden
             } else if (viewSetup === "allnosearch") {
                 menuOptions = <Form inline="true">
                     {btnAdd} {btnEdit}
                 </Form>;
 
+            //Otherwise, render everything
             } else if (viewSetup === "all") {
                 menuOptions = <Form inline="true">
                     <Form.Group>
@@ -463,7 +687,6 @@ class GridComponent extends Component {
 
                         <Form.Control as="select"
                                       onChange={this.handleSearchColumnChange}
-                                      defaultValue="default"
                                       value={this.state.searchColumn}
                                       style={{fontSize: 12, marginRight: 5}}>
                             {searchColumns}

@@ -3,17 +3,19 @@ import './App.css';
 
 import GridComponent from "./GridComponent";
 
-const labels1 = ["First Name", "Last Name", "Age"];
+/*const labels1 = ["First Name", "Last Name", "Age"];
 const data1 = [{"First Name": "Lord", "Last Name": "Mendoza", "Age": 24},
     {"First Name": "Daniel", "Last Name": "Kim", "Age": 26},
     {"First Name": "Kiran", "Last Name": "Adepu", "Age": 28},
-    {"First Name": "Nikunj", "Last Name": "Patel", "Age": 40}];
+    {"First Name": "Nikunj", "Last Name": "Patel", "Age": 40}];*/
 
 const labels2 = ["Make", "Model", "Color"];
+/*
 const data2 = [{"Make": "Honda", "Model": "Civic", "Color": "Black"},
     {"Make": "Honda", "Model": "Accord", "Color": "Blue"},
     {"Make": "Toyota", "Model": "Corolla", "Color": "Silver"},
     {"Make": "Tesla", "Model": "Model S", "Color": "Silver"}];
+*/
 
 const sampleData = (len) => {
     let retVal = [];
@@ -56,7 +58,7 @@ class App extends Component {
                                toggleSelect={true}
                                selectedValues={this.handleSelectedValues}
 
-                               viewConfig="bare"
+                               viewConfig="all"
 
                                blockedColumns={this.state.blockedColumns}
                                blockedSearchColumns={this.state.blockedSearchColumns}
