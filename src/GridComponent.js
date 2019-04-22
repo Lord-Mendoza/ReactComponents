@@ -7,6 +7,7 @@ Lord Mendoza - 4/19/19
 
 //React
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import './GridComponent.css';
 
 //DevExpress Grid
@@ -804,5 +805,226 @@ class GridComponent extends Component {
         );
     }
 }
+
+GridComponent.propTypes = {
+    /**
+     <b>Description:</b> The list of columns for the given grid.
+     <b>Value:</b> array of strings
+     [ "<name of column>", "<next column name>", ... ]
+     <b>Example: </b>
+     ["First Name", "Last Name", "Age"]
+     */
+    columns: PropTypes.array.isRequired,
+
+    /**
+     <b>Description:</b> The list of rows (data) for the given grid.
+     <i> Note: for proper sorting behavior, ensure to pass numbers as column values for number-typed columns. </i>
+
+     <b>Value:</b> Json array whose keys corresponds to the columns prop.
+     [
+     {<name of column>: <column value>, <next column>: <column value>, ...},
+     ...
+     ]
+     <b>Example: </b>
+     [
+     {"First Name": "John", "Last Name": "Doe", "Age": 24},
+     {"First Name": "Jane", "Last Name": "Doe", "Age": 19},
+     ]
+     */
+    rows: PropTypes.array.isRequired,
+
+    /**
+     <b>Description:</b> Toggles a particular grid setup such as showing the grid only/grid + refresh button/grid + refresh + search, etc.
+
+     <b>Value:</b> a string of either
+     i. "bare" = renders only the grid with pagination & "# of entries at a time" options available.
+     ii. "simple" = similar to bare, but includes a refresh button
+     iii. "search" = similar to simple, but includes search by column components
+     iv. "all" = similar to search but includes the create/edit/delete components
+     v. "allnosearch" = similar to all but excludes the search by column components
+
+     <b>Default:</b> "simple"
+     */
+    viewConfig: PropTypes.string,
+
+    /**
+     <b>Description:</b> Toggles whether to show the select buttons on the left side of the rows for external manipulation. If set to true, then selectValues prop *needs* to exist & have a callback function set to it, otherwise the select buttons will NOT render. It will also not render if "viewConfig" is set to "all" or "allnosearch".
+     <b>Value:</b> takes a boolean
+
+     <b>Default:</b> false
+     */
+    toggleSelect: PropTypes.bool,
+
+    /**
+     <b>Description:</b> A callback function called by GridComponent to pass the values that the users have selected to the parent component; this will return an array of json object(s) that corresponds to the ones provided in the rows prop.
+     <b>Value:</b> A callback function
+     */
+    selectedValues: function(props, propName) {
+        if (props['toggleSelect'] === true && props[propName] === undefined){
+            return new Error(
+                'Setting toggleSelect prop to true requires for selectedValues to be defined.'
+            );
+        }
+        else if (props['toggleSelect'] === true && (typeof props[propName] !== 'function')){
+            return new Error(
+                'selectedValues requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> A list of columns that will be blocked from editing.
+     <b>Value:</b> An array corresponding to elements in the "columns" prop.
+     */
+    blockedColumns: PropTypes.array,
+
+    /**
+     <b>Description:</b> A list of columns that will be blocked for searching.
+     <b>Value:</b> An array corresponding to elements in the "columns" prop.
+     */
+    blockedSearchColumns: PropTypes.array,
+
+    /**
+     <b>Description:</b> Setting the default number of entries to view per page, as well as what options will be provided to the user.
+     <b>Value:</b> Takes an array composed of two elements:
+     i. The default page size set
+     ii. An array of page size options
+
+     <b>Default:</b> [10, [10, 25, 50]]
+     */
+    pageConfig: PropTypes.array,
+
+    /**
+     <b>Description:</b> Toggles whether the user is allowed to reorder the columns.
+     <b>Value:</b> Boolean
+     */
+    colReorder: PropTypes.bool,
+
+    /**
+     <b>Description:</b> When viewConfig is set to "all" or "allnosearch", this property must be included to retrieve the rows that the user opted to delete. The callback function will be called with a parameter containing an array of json objects corresponding to the rows provided in "rows" prop.
+     <b>Value:</b> A callback function.
+     */
+    deletedValues: function(props, propName) {
+        if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && props[propName] === undefined){
+            return new Error(
+                'Setting viewConfig prop to "all" or "allnosearch" requires for deletedValues to be defined.'
+            );
+        }
+        else if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'deletedValues requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> When viewConfig is set to "all" or "allnosearch", this property must be included to retrieve the row that has been edited. The callback function will be called with a parameter containing an array of json objects where the first element is a row corresponding to one of the rows in the "row" prop, and the second element being the changes made to that row.
+     <b>Value:</b> A callback function.
+     */
+    editedValues: function(props, propName) {
+        if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && props[propName] === undefined){
+            return new Error(
+                'Setting viewConfig prop to "all" or "allnosearch" requires for editedValues to be defined.'
+            );
+        }
+        else if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'editedValues requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> When viewConfig is set to "all" or "allnosearch", this property must be included to respond to the user's desire to add new entry. Note that this won't provide any create form.
+     <b>Value:</b> A callback function.
+     */
+    createToggled: function(props, propName) {
+        if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && props[propName] === undefined){
+            return new Error(
+                'Setting viewConfig prop to "all" or "allnosearch" requires for createToggled to be defined.'
+            );
+        }
+        else if ((props['viewConfig'] === 'all' || props['viewConfig'] === 'allnosearch') && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'createToggled requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> When viewConfig is set to "simple", "search", "all" or "allnosearch", this property must be included to respond to the user's desire to refresh the data in the grid. Note that the ideal response to this is to change the values provided in the "columns" and "rows" prop of GridComponent to reflect the latest data.
+     <b>Value:</b> A callback function.
+     */
+    refreshToggled: function(props, propName) {
+        if ((props['viewConfig'] !== 'bare') && props[propName] === undefined){
+            return new Error(
+                'Setting viewConfig prop anything but "bare" requires for refreshToggled to be defined.'
+            );
+        }
+        else if ((props['viewConfig'] !== 'bare') && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'refreshToggled requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> Toggles whether remote paging is implemented to this grid or not. This will require totalCount, currentPage, and currentPageSize props to also be provided.
+     <b>Value:</b> Boolean
+     */
+    remotePaging: PropTypes.bool,
+
+//------------
+    /**
+     <b>Description:</b> Required when remotePaging is toggled to true; this lets the GridComponent know how many data it will page through.
+     <b>Value:</b> Number
+     */
+    totalCount: function(props, propName) {
+        if ((props['remotePaging'] === true) && props[propName] === undefined){
+            return new Error(
+                'Setting remotePaging prop to true requires for totalCount to be defined.'
+            );
+        }
+        else if ((props['remotePaging'] === true) && (typeof props[propName] !== 'number') ){
+            return new Error(
+                'totalCount requires a number as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> Required when remotePaging is toggled to true; this lets GridComponent know which page to toggle as selected.
+     <b>Value:</b> Callback function.
+     */
+    currentPage: function(props, propName) {
+        if ((props['remotePaging'] === true) && props[propName] === undefined){
+            return new Error(
+                'Setting remotePaging prop to true requires for currentPage to be defined.'
+            );
+        }
+        else if ((props['remotePaging'] === true) && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'currentPage requires a function as value.'
+            );
+        }
+    },
+
+    /**
+     <b>Description:</b> Required when remotePaging is toggled to true; this lets GridComponent know which pageSize to toggle as selected.
+     <b>Value:</b> Callback function.
+     */
+    currentPageSize: function(props, propName) {
+        if ((props['remotePaging'] === true) && props[propName] === undefined){
+            return new Error(
+                'Setting remotePaging prop to true requires for currentPageSize to be defined.'
+            );
+        }
+        else if ((props['remotePaging'] === true) && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'currentPageSize requires a function as value.'
+            );
+        }
+    },
+};
 
 export default GridComponent;
