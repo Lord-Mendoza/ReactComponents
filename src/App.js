@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 
-import GridComponent from "./GridComponent";
+/*import GridComponent from "./GridComponent";
 
 const labels2 = ["Make", "Model", "Color"];
 const sampleData = (len) => {
@@ -10,7 +10,7 @@ const sampleData = (len) => {
         retVal.push({"Make": "Make Sample" + i, "Model": "Model Sample" + i, "Color": "Color Sample" + i});
     }
     return retVal;
-};
+};*/
 
 /*
 Popup
@@ -18,47 +18,49 @@ Popup
 import PopupComponent from "./PopupComponent"
 import {Image, Modal} from "react-bootstrap";*/
 
-/*import FormComponent from './FormComponent'*/
+import FormComponent from './FormComponent'
 
 class App extends Component {
     constructor(props){
         super(props);
 
         this.state = {
-            labels: labels2,
+            /*labels: labels2,
             data: sampleData(100),
             blockedColumns: ["Color"],
             blockedSearchColumns: ["Color"],
             currentPage: 0,
             currentPageSize: 10,
-            totalDataCount: 100
+            totalDataCount: 100*/
 
-            /*values: "",
+            values: "",
             configuration: [{name: "First name", type: "text", placeholder: "required"},
                             {name: "Last name", type: "email", placeholder: "required"},
-                            {name: "Age", type: "date", placeholder: "required"}]*/
+                            {name: "Age", type: "date", placeholder: "required"},
+                            {name: "Year in College", type: "select", options: ["Freshman", "Sophomore", "Junior", "Senior"]}],
+            invalid: []
         };
 
-        this.handleSelectedValues = (values) => {this.setState({selectedValues: values})};
+        /*this.handleSelectedValues = (values) => {this.setState({selectedValues: values})};
         this.handleDeletedValues = (values) => {this.setState({deletedValues: values})};
         this.handleEditedValues = (values) => {this.setState({editedValues: values})};
         this.handleSearchValues = (values) => {this.setState({searchValues: values})};
         this.handlePageChange = (value) => {this.setState({currentPage: value})};
         this.handlePageSizeChange = (value) => {this.setState({currentPageSize: value})};
         this.handleRefresh = () => {alert("refresh triggered!")};
-        this.handleCreate = () => {alert("create triggered!")};
+        this.handleCreate = () => {alert("create triggered!")};*/
 
-        /*this.getFormValues = (values) => {
-          this.setState({values})
-        };*/
+        this.getFormValues = (values) => {
+            this.setState({values})
+        };
     }
 
     render() {
-        /*const {configuration} = this.state;*/
+        const {configuration, invalid} = this.state;
 
         return (
             <div>
-                <GridComponent columns={this.state.labels}
+                {/*<GridComponent columns={this.state.labels}
                                rows={this.state.data}
 
                                viewConfig="all"
@@ -69,7 +71,7 @@ class App extends Component {
                                blockedColumns={this.state.blockedColumns}
                                blockedSearchColumns={this.state.blockedSearchColumns}
 
-                               remotePaging={true}
+                               remotePaging={false}
                                totalCount={this.state.totalDataCount}
                                currentPage={this.handlePageChange}
                                currentPageSize={this.handlePageSizeChange}
@@ -80,7 +82,7 @@ class App extends Component {
                                editedValues={this.handleEditedValues}
                                refreshToggled={this.handleRefresh}
                                createToggled={this.handleCreate}
-                />
+                />*/}
 
                 {/*
                 Popup
@@ -90,10 +92,14 @@ class App extends Component {
                                 footerConfig={"submit"}
                 />*/}
 
-                {/*<FormComponent
+                <FormComponent
                         configuration={configuration}
                         formValues={this.getFormValues}
-                    />*/}
+
+                        submitForm={false}
+                        clearForm={false}
+                        markInvalid={invalid}
+                    />
             </div>
         );
     }
