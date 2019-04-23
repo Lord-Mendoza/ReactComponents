@@ -1,12 +1,24 @@
-import React, {Component} from 'react';
+/*
+Lord Mendoza - 4/19/19
+ */
+//======================================================================================================================
+//============================================= IMPORTS ================================================================
 
-import {Form} from 'react-bootstrap';
+//React
+import React, {Component} from 'react';
 import PropTypes from "prop-types";
+
+//React-Bootstrap
+import {Form} from 'react-bootstrap';
+
+//======================================================================================================================
+//=========================================== START OF CLASS ===========================================================
 
 class FormComponent extends Component {
     constructor(props) {
         super(props);
 
+        //Initializing the state here (since componentDidMount doesn't take affect until after render which causes errors)
         let {configuration, formValues} = props;
         let values = {};
         if (configuration !== undefined && formValues !== undefined) {
@@ -21,15 +33,24 @@ class FormComponent extends Component {
             values = {};
         }
 
+        //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
             configuration,
             values,
             invalidValues: []
         };
 
+        //Helper functions
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
+    //==================================================================================================================
+    //================================== REACT STATE COMPONENTS ========================================================
+
+    /*
+    This checks for any changes from the parent component, such as if submit/clear form is toggled, or if things are
+    added/removed from the markInvalid array
+     */
     componentDidUpdate(prevProps) {
         if (this.props.submitForm !== prevProps.submitForm
             || this.props.clearForm !== prevProps.clearForm
@@ -53,6 +74,13 @@ class FormComponent extends Component {
         }
     }
 
+    //==================================================================================================================
+    //=================================== HELPER FUNCTIONS =============================================================
+
+    /*
+    Retrieves the form component's name & value, and inserts it to the state prop "values" which is later
+    thrown back to the parent component.
+     */
     handleInputChange(event) {
         const target = event.target;
         const name = target.name;
@@ -66,15 +94,23 @@ class FormComponent extends Component {
         });
     }
 
+    //=========================================== RENDER ===============================================================
+
     render() {
         const {configuration, markInvalid} = this.props;
 
+        /*
+        Creating the form one-by-one while checking for the type (if it's a select type, then it will have a different
+        form creation setup).
+         */
         let form;
         if (configuration !== undefined) {
             form = [];
             let key = 0;
 
             configuration.forEach(v => {
+
+                //Verifying that the form component to be generated is not marked invalid
                 let isInvalid = false;
                 if (markInvalid !== undefined){
                     if (markInvalid.includes(v.name)) {
@@ -117,6 +153,7 @@ class FormComponent extends Component {
             });
         }
 
+        //Rendering the form in full
         return (
             <div>
                 {form}
@@ -124,6 +161,8 @@ class FormComponent extends Component {
         );
     }
 }
+
+//=========================================== DOCUMENTATIONS ===========================================================
 
 FormComponent.propTypes = {
     /**
