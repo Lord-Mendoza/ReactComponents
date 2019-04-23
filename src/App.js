@@ -12,13 +12,10 @@ const sampleData = (len) => {
     return retVal;
 };*/
 
-/*
-Popup
-
 import PopupComponent from "./PopupComponent"
-import {Image, Modal} from "react-bootstrap";*/
+/*import {Modal, Image, Button} from "react-bootstrap";*/
 
-import FormComponent from './FormComponent'
+/*import FormComponent from './FormComponent'*/
 
 class App extends Component {
     constructor(props){
@@ -33,12 +30,12 @@ class App extends Component {
             currentPageSize: 10,
             totalDataCount: 100*/
 
-            values: "",
+            /*values: "",
             configuration: [{name: "First name", type: "text", placeholder: "required"},
                             {name: "Last name", type: "email", placeholder: "required"},
                             {name: "Age", type: "date", placeholder: "required"},
                             {name: "Year in College", type: "select", options: ["Freshman", "Sophomore", "Junior", "Senior"]}],
-            invalid: []
+            invalid: []*/
         };
 
         /*this.handleSelectedValues = (values) => {this.setState({selectedValues: values})};
@@ -50,13 +47,21 @@ class App extends Component {
         this.handleRefresh = () => {alert("refresh triggered!")};
         this.handleCreate = () => {alert("create triggered!")};*/
 
-        this.getFormValues = (values) => {
+        /*this.getFormValues = (values) => {
             this.setState({values})
+        };*/
+
+        this.handleReset = () => {
+            alert("Reset pressed");
+        };
+
+        this.handleSubmit = () => {
+            alert("Submit pressed");
         };
     }
 
     render() {
-        const {configuration, invalid} = this.state;
+        /*const {configuration, invalid} = this.state;*/
 
         return (
             <div>
@@ -84,22 +89,22 @@ class App extends Component {
                                createToggled={this.handleCreate}
                 />*/}
 
-                {/*
-                Popup
-
-                <PopupComponent header={"Hello"}
-                                content={<p> <Image src="reject.png"/> You made an invalid edit. Please try again. </p>}
-                                footerConfig={"submit"}
-                />*/}
-
-                <FormComponent
+                {/*<FormComponent
                         configuration={configuration}
                         formValues={this.getFormValues}
 
                         submitForm={false}
                         clearForm={false}
                         markInvalid={invalid}
-                    />
+                />*/}
+
+                <PopupComponent header={"Danger"}
+                                content={<p> You made an invalid edit. Please try again. </p>}
+                                footerConfig={"all"}
+
+                                resetToggled={this.handleReset}
+                                submitToggled={this.handleSubmit}
+                />
             </div>
         );
     }

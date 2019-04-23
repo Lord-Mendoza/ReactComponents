@@ -936,7 +936,8 @@ GridComponent.propTypes = {
     },
 
     /**
-     <b>Description:</b> When viewConfig is set to "all" or "allnosearch", this property must be included to respond to the user's desire to add new entry. Note that this won't provide any create form.
+     <b>Description:</b> When viewConfig is set to "all" or "allnosearch", this property must be included to respond to the user's desire to add new entry.
+     <i> Note: that this won't provide any create form. </i>
      <b>Value:</b> A callback function.
      */
     createToggled: function(props, propName) {
