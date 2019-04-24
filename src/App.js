@@ -12,8 +12,8 @@ const sampleData = (len) => {
     return retVal;
 };*/
 
-/*import PopupComponent from "./PopupComponent"*/
-import MaskComponent from "./MaskComponent";
+import PopupComponent from "./PopupComponent"
+/*import MaskComponent from "./MaskComponent";*/
 /*import {Modal, Image, Button} from "react-bootstrap";*/
 
 /*import FormComponent from './FormComponent'*/
@@ -99,18 +99,18 @@ class App extends Component {
                         markInvalid={invalid}
                 />*/}
 
-                {/*<PopupComponent header={"Danger"}
-                                content={<p> You made an invalid edit. Please try again. </p>}
+                <PopupComponent header={"Success!"}
+                                content={<p> You've successfully uploaded your first react website. </p>}
                                 footerConfig={"all"}
 
                                 resetToggled={this.handleReset}
                                 submitToggled={this.handleSubmit}
-                />*/}
+                />
 
-                <MaskComponent header={"Please Wait"}
+                {/*<MaskComponent header={"Please Wait"}
                                content={"Adding..."}
                                show={true}
-                               loadingIcon={true}/>
+                               loadingIcon={true}/>*/}
             </div>
         );
     }
