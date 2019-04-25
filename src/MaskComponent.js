@@ -7,6 +7,7 @@ Lord Mendoza - 4/23/19
 //React
 import React, {Component} from 'react';
 import PropTypes from "prop-types";
+import './MaskComponent.css'
 
 //React-Bootstrap
 import {Image, Modal} from "react-bootstrap";
