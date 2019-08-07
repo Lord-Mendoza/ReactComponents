@@ -188,13 +188,13 @@ class GridComponent extends Component {
 
         //Checking which viewSetup the developer went with. Consult the wiki for more details on the individual
         //options.
-        let viewSetup = "simple";
+        let viewSetup = "bare";
         if (viewConfig !== undefined) {
             if (viewConfig === "search" || viewConfig === "allnosearch" || viewConfig === "all"
                 || viewConfig === "bare")
                 viewSetup = viewConfig;
             else
-                viewSetup = "simple";
+                viewSetup = "bare";
         }
 
         //Configuring certain columns to not be editable based on the developer's choice.
@@ -317,13 +317,13 @@ class GridComponent extends Component {
 
             //Checking which viewSetup the developer went with. Consult the wiki for more details on the individual
             //options.
-            let viewSetup = "simple";
+            let viewSetup = "bare";
             if (viewConfig !== undefined) {
                 if (viewConfig === "search" || viewConfig === "allnosearch" || viewConfig === "all"
                     || viewConfig === "bare")
                     viewSetup = viewConfig;
                 else
-                    viewSetup = "simple";
+                    viewSetup = "bare";
             }
 
             //Configuring certain columns to not be editable based on the developer's choice.
@@ -958,12 +958,12 @@ GridComponent.propTypes = {
      <b>Value:</b> A callback function.
      */
     refreshToggled: function(props, propName) {
-        if ((props['viewConfig'] !== 'bare') && props[propName] === undefined){
+        if ((props['viewConfig'] !== 'bare') && props[propName] !== undefined){
             return new Error(
-                'Setting viewConfig prop anything but "bare" requires for refreshToggled to be defined.'
+                'Setting viewConfig prop to anything but "bare" requires for refreshToggled to be defined.'
             );
         }
-        else if ((props['viewConfig'] !== 'bare') && (typeof props[propName] !== 'function') ){
+        else if ((props['viewConfig'] !== 'bare') && props[propName] !== undefined && (typeof props[propName] !== 'function') ){
             return new Error(
                 'refreshToggled requires a function as value.'
             );

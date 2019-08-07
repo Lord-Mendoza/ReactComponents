@@ -63,7 +63,13 @@ class FormComponent extends Component {
                 formValues(values);
             } else if (clearForm) {
                 Object.keys(values).forEach(v => {
-                    values[v] = "";
+                    this.props.configuration.forEach(entry => {
+                       if (entry["name"] === v)
+                           if (entry["type"] === "select")
+                               values[v] = "default";
+                           else
+                               values[v] = "";
+                    });
                 });
                 this.setState({values});
             } else if (markInvalid !== undefined) {

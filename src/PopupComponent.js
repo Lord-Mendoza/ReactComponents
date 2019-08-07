@@ -32,6 +32,8 @@ class PopupComponent extends Component {
         //Helper functions for handling interactions with the modal (such as submit, reset, & closing)
         this.closePopup = () => {
             const {show} = this.state;
+            this.props.closeToggled(true);
+
             this.setState({show: !show})
         };
         this.toggleReset = () => {
@@ -164,6 +166,12 @@ PopupComponent.propTypes = {
      iv. "all" = renders a close, reset, & submit button. Ideal for forms.
      */
     footerConfig: PropTypes.string.isRequired,
+
+    /**
+     <b> Description: </b> A callback function to call in the parent component when the popup is closed.
+     <b> Value: </> A callback function.
+     */
+    closeToggled: PropTypes.func.isRequired,
 
     /**
      <b>Description:</b> The custom footer buttons as defined by the developer.
