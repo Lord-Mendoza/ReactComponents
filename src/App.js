@@ -10,7 +10,8 @@ import './App.css';
 // import {Image} from "react-bootstrap";
 
 //3rd
-
+// import LoaderComponent from "./LoaderComponent";
+// import GridComponent from "./GridComponent";
 
 class App extends Component {
     constructor(props, context){
@@ -102,6 +103,12 @@ class App extends Component {
                 {/* Show off the most basic popup, then show the form component inside popup*/}
                 {/*{popup}*/}
 
+                 {/*Show off what happens when isLoading changes; also show loadingMessage & inverted*/}
+                {/*<LoaderComponent isLoading={true}
+                                 content ={<div>
+                                     <GridComponent columns={["Name", "Age"]} rows={[{Name: "Sarah", Age: 24}, {Name: "John", Age: 35}]}/>
+                                 </div>}
+                />*/}
 
             </div>
         );
