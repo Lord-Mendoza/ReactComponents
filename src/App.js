@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import './App.css';
 
-// //1st
+//1st
 // import GridComponent from "./GridComponent";
 
-// //2nd
+//2nd
 // import FormComponent from "./FormComponent";
 // import PopupComponent from "./PopupComponent";
 // import {Image} from "react-bootstrap";
@@ -12,6 +12,9 @@ import './App.css';
 //3rd
 // import LoaderComponent from "./LoaderComponent";
 // import GridComponent from "./GridComponent";
+
+//4th
+// import FileUploadComponent from "./FileUploadComponent";
 
 class App extends Component {
     constructor(props, context){
@@ -27,6 +30,7 @@ class App extends Component {
         this.closePopup = this.closePopup.bind(this);
         this.resetForm = this.resetForm.bind(this);
         this.submitForm = this.submitForm.bind(this);
+        this.getUploadedFiles = this.getUploadedFiles.bind(this);
     }
 
     getFormValues(values) {
@@ -57,6 +61,10 @@ class App extends Component {
         } else {
             this.setState({submitForm: false});
         }
+    }
+
+    getUploadedFiles(files){
+        console.log(files);
     }
 
     render() {
@@ -110,6 +118,10 @@ class App extends Component {
                                  </div>}
                 />*/}
 
+                {/*<FileUploadComponent files={this.getUploadedFiles}
+                                     fileType={"text/plain"}
+                                     resetUponSubmit={false}
+                />*/}
             </div>
         );
     }
