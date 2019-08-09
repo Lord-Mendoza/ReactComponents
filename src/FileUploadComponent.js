@@ -25,15 +25,23 @@ function FileUpload(props) {
 
     const {getRootProps, getInputProps} = useDropzone({onDrop, accept: props.fileType});
 
-    return (
-        <section className="container">
-            <div {...getRootProps({className: 'dropzone'})}>
-                <input {...getInputProps()} />
-                <Image src={"./upload.png"}/>
-                <h4>Drag and drop some files here, or click to select files</h4>
+    if (props.uploadByBtn)
+        return (<div {...getRootProps({className: 'ui tiny icon right labeled button'})}>
+                <Icon name='upload'/>
+                {props.fileUploadText}
+                <input {...getInputProps()}/>
             </div>
-        </section>
-    );
+        );
+    else
+        return (
+            <section className="container">
+                <div {...getRootProps({className: 'dropzone'})}>
+                    <input {...getInputProps()} />
+                    <Image src={"./upload.png"}/>
+                    <h4>{props.fileUploadText}</h4>
+                </div>
+            </section>
+        );
 }
 
 //======================================================================================================================
@@ -53,11 +61,33 @@ class FileUploadComponent extends Component {
             if (typeof this.props.resetUponSubmit === "boolean")
                 resetUponSubmit = this.props.resetUponSubmit;
 
+        let uploadByBtn = false;
+        if (this.props.uploadByBtn !== undefined)
+            if (typeof this.props.uploadByBtn === "boolean")
+                uploadByBtn = this.props.uploadByBtn;
+
+        let fileUploadText = "Drag and drop some files here, or click to select files";
+        if (this.props.fileUploadText !== undefined) {
+            if (typeof this.props.fileUploadText === "string") {
+                fileUploadText = this.props.fileUploadText;
+            }
+        } else if (uploadByBtn === true) {
+            fileUploadText = "Upload";
+        }
+
+        let showFileUploadManager = true;
+        if (this.props.showFileUploadManager !== undefined)
+            if (typeof this.props.showFileUploadManager === "boolean")
+                showFileUploadManager = this.props.showFileUploadManager;
+
         //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
             files: [],
             fileType,
-            resetUponSubmit
+            resetUponSubmit,
+            fileUploadText,
+            uploadByBtn,
+            showFileUploadManager
         };
 
         //------The functions for this class------
@@ -74,7 +104,13 @@ class FileUploadComponent extends Component {
     Retrieving the list of files to be displayed underneath the file drop component.
      */
     getListOfFiles(files) {
-        this.setState({files});
+        const {showFileUploadManager} = this.state;
+
+        if (!showFileUploadManager) {
+            if (files !== [])
+                this.props.files(files);
+        } else
+            this.setState({files});
     }
 
     /*
@@ -95,7 +131,7 @@ class FileUploadComponent extends Component {
     }
 
     /*
-    Does the actual file upload to the backend.
+    Does the actual file upload.
      */
     submitFiles() {
         let {files, resetUponSubmit} = this.state;
@@ -110,7 +146,7 @@ class FileUploadComponent extends Component {
     //=========================================== RENDER ===============================================================
 
     render() {
-        const {files, fileType} = this.state;
+        const {files, fileType, fileUploadText, uploadByBtn, showFileUploadManager} = this.state;
 
         /*
         Displaying the list of files that the user uploaded underneath the file drop component. It will display a trash
@@ -127,33 +163,49 @@ class FileUploadComponent extends Component {
         upload queue.
          */
         let filesToBeUploaded;
-        if (listOfFiles.length > 0) {
-            filesToBeUploaded = <div style={{padding: "30px 10px 5px 0px"}}>
-                <Button icon labelPosition='right' size='tiny' onClick={this.resetFiles}>
-                    <Icon name='repeat'/> Reset </Button>
+        if (showFileUploadManager) {
+            if (listOfFiles.length > 0) {
+                filesToBeUploaded = <div style={{padding: "30px 10px 5px 0px"}}>
+                    <Button icon labelPosition='right' size='tiny' onClick={this.resetFiles}>
+                        <Icon name='repeat'/> Reset </Button>
 
-                <Button icon labelPosition='right' size='tiny' onClick={this.submitFiles}>
-                    <Icon name='send'/> Submit </Button>
+                    <Button icon labelPosition='right' size='tiny' onClick={this.submitFiles}>
+                        <Icon name='send'/> Submit </Button>
 
-                <h4 style={{marginTop: "10px", marginBottom: "10px"}}> Files to be uploaded: </h4>
-                <ul style={{
-                    listStyleType: "none",
-                    overflowY: "scroll",
-                    maxHeight: "250px",
-                    paddingRight: "50px"
-                }}>{listOfFiles}</ul>
-            </div>;
+                    <h4 style={{marginTop: "10px", marginBottom: "10px"}}> Files to be uploaded: </h4>
+                    <ul style={{
+                        listStyleType: "none",
+                        overflowY: "scroll",
+                        maxHeight: "250px",
+                        paddingRight: "50px"
+                    }}>{listOfFiles}</ul>
+                </div>;
+            }
         }
 
-        return (
-            <div>
-                <Container>
+        if (uploadByBtn) {
+            return (
+                <div>
                     <FileUpload listOfFiles={this.getListOfFiles}
-                                fileType={fileType}/>
+                                fileType={fileType}
+                                fileUploadText={fileUploadText}
+                                uploadByBtn={uploadByBtn}/>
                     {filesToBeUploaded}
-                </Container>
-            </div>
-        );
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <Container>
+                        <FileUpload listOfFiles={this.getListOfFiles}
+                                    fileType={fileType}
+                                    fileUploadText={fileUploadText}
+                                    uploadByBtn={uploadByBtn}/>
+                        {filesToBeUploaded}
+                    </Container>
+                </div>
+            );
+        }
     }
 }
 
@@ -169,24 +221,69 @@ FileUploadComponent.propTypes = {
     /**
      <b>Description:</b> Determines the file type that the file uploader will accept.
      <b>Value:</b> A string that specifies a file type.
+
+     The value must be a comma-separated list of unique content type specifiers:
+     -A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
+     -A valid MIME type with no extensions.
+     -audio/\* representing sound files.
+     -video/\* representing video files.
+     -image/\* representing image files.
      <b>Default:</b> "" (which will accept any file type).
      */
-    fileType: function(props, propName) {
-      if (props[propName] !== undefined)
-          if (typeof props[propName] !== "string")
-              return new Error ('fileType requires a string as a value.')
+    fileType: function (props, propName) {
+        if (props[propName] !== undefined)
+            if (typeof props[propName] !== "string")
+                return new Error('fileType requires a string as a value.')
     },
 
     /**
-     <b>Description:</b> Determines whether to reset the list of files uploaded upon clicking "submit".
+     <b>Description:</b> Determines whether to reset the list of files uploaded upon clicking "submit". Only applies when showUploadManager is set to true.
      <b>Value:</b> A boolean
      <b>Default:</b> true
      */
-    resetUponSubmit: function(props, propName){
+    resetUponSubmit: function (props, propName) {
         if (props[propName] !== undefined)
             if (typeof props[propName] !== 'boolean')
-                return new Error ('resetUponSubmit requires a boolean as value.')
+                return new Error('resetUponSubmit requires a boolean as value.');
+            if (props["showFileUploadManager"] !== undefined)
+                if (props["showFileUploadManager"] === false)
+                    return new Error('resetUponSubmit only applies when showFileUploadManager is set to true.');
     },
+
+    /**
+     <b>Description:</b> The label of the upload field/button.
+     <b>Value:</b> A string
+     <b>Default:</b>
+        -If uploadByBtn is set to true, the default fileUploadText is "Upload"
+        -Otherwise, it's "Drag and drop some files here, or click to select files"
+     */
+    fileUploadText: function (props, propName) {
+        if (props[propName] !== undefined)
+            if (typeof props[propName] !== 'string')
+                return new Error('fileUploadText requires a string as value.')
+    },
+
+    /**
+     <b>Description:</b> Specifying whether to render a button, or an upload field.
+     <b>Value:</b> A boolean
+     <b>Default:</b> false
+     */
+    uploadByBtn: function (props, propName) {
+        if (props[propName] !== undefined)
+            if (typeof props[propName] !== 'boolean')
+                return new Error('uploadByBtn requires a boolean as value.')
+    },
+
+    /**
+     <b>Description:</b> Specifying whether to show the files uploaded queue to the user, and allow them to reset, delete, and submit them.
+     <b>Value:</b> A boolean
+     <b>Default:</b> true
+     */
+    showFileUploadManager: function (props, propName) {
+    if (props[propName] !== undefined)
+        if (typeof props[propName] !== 'boolean')
+            return new Error('showFileUploadManager requires a boolean as value.')
+    }
 };
 
 export default FileUploadComponent;

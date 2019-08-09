@@ -14,7 +14,7 @@ import './App.css';
 // import GridComponent from "./GridComponent";
 
 //4th
-// import FileUploadComponent from "./FileUploadComponent";
+import FileUploadComponent from "./FileUploadComponent";
 
 class App extends Component {
     constructor(props, context){
@@ -118,10 +118,8 @@ class App extends Component {
                                  </div>}
                 />*/}
 
-                {/*<FileUploadComponent files={this.getUploadedFiles}
-                                     fileType={"text/plain"}
-                                     resetUponSubmit={false}
-                />*/}
+                <FileUploadComponent files={this.getUploadedFiles}
+                                     uploadByBtn={true}/>
             </div>
         );
     }
