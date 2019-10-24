@@ -138,7 +138,7 @@ class GridComponent extends Component {
 
         //Setting up the columns for rendering
         let gridColumns = columns.map(v => {
-            return {name: v.replace(/\s/g, ""), title: v};
+            return {name: v.replace(/ /g, ""), title: v};
         });
 
         //Setting up column labels to be used later by search component
@@ -151,7 +151,7 @@ class GridComponent extends Component {
 
             columns.forEach(p => {
                 if (v.hasOwnProperty(p)) {
-                    gridRow[p.replace(/\s/g, "")] = v[p];
+                    gridRow[p.replace(/ /g, "")] = v[p];
                 }
             });
 
@@ -178,7 +178,7 @@ class GridComponent extends Component {
 
         //Setting up initial widths for viewing
         let columnWidths = columns.map(v => {
-            return {columnName: v.replace(/\s/g, ""), width: 180};
+            return {columnName: v.replace(/\ \/g, ""), width: 180};
         });
 
         //Checking if the developer opted to allow column reordering
@@ -307,7 +307,7 @@ class GridComponent extends Component {
 
             //Setting up initial widths for viewing
             let columnWidths = columns.map(v => {
-                return {columnName: v.replace(/\s/g, ""), width: 180};
+                return {columnName: v.replace(/\ \/g, ""), width: 180};
             });
 
             //Checking if the developer opted to allow column reordering
@@ -331,7 +331,7 @@ class GridComponent extends Component {
             if (blockedColumns !== undefined) {
                 if (blockedColumns.length > 0) {
                     blockedColumns.forEach(v => {
-                        nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
+                        nonEditableColumns.push({columnName: v.replace(/\ \/g, ""), editingEnabled: false});
                     });
                 }
             }
