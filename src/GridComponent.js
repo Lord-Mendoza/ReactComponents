@@ -62,7 +62,7 @@ class GridComponent extends Component {
 
             //Custom Configurations
             columnLabels: [],
-            columnWidths: [],
+            colWidths: [],
             pageSize: 10,
             pageSizes: [10, 50, 100],
             currentPage: 0,
@@ -79,8 +79,8 @@ class GridComponent extends Component {
 
         //In-line methods that is better to be declared here rather than outside the constructor (since its simple)
         this.changeSorting = sorting => this.setState({sorting});
-        this.changeColumnWidths = (columnWidths) => {
-            this.setState({columnWidths})
+        this.changeColumnWidths = (colWidths) => {
+            this.setState({colWidths})
         };
         this.changeSelection = selection => {
             this.setState({selection}, this.handleSelectedValues)
@@ -133,12 +133,13 @@ class GridComponent extends Component {
     componentDidMount() {
         const {
             columns, rows, pageConfig, toggleSelect, viewConfig, colReorder, blockedColumns,
-            blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount
+            blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount,
+            columnWidths
         } = this.props;
 
         //Setting up the columns for rendering
         let gridColumns = columns.map(v => {
-            return {name: v.replace(/ /g, ""), title: v};
+            return {name: v.replace(/\s/g, ""), title: v};
         });
 
         //Setting up column labels to be used later by search component
@@ -150,8 +151,9 @@ class GridComponent extends Component {
             let gridRow = {};
 
             columns.forEach(p => {
-                if (v.hasOwnProperty(p)) {
-                    gridRow[p.replace(/ /g, "")] = v[p];
+                let property = p.replace(/\s/g, "");
+                if (v.hasOwnProperty(property)) {
+                    gridRow[property] = v[property];
                 }
             });
 
@@ -177,8 +179,12 @@ class GridComponent extends Component {
         }
 
         //Setting up initial widths for viewing
-        let columnWidths = columns.map(v => {
-            return {columnName: v.replace(/\ \/g, ""), width: 180};
+        let colWidths = columns.map(v => {
+            let property = v.replace(/\s/g, "");
+            if (columnWidths && columnWidths.hasOwnProperty(property))
+                return {columnName: property, width: columnWidths[property]};
+            else
+                return {columnName: property, width: 180};
         });
 
         //Checking if the developer opted to allow column reordering
@@ -202,7 +208,7 @@ class GridComponent extends Component {
         if (blockedColumns !== undefined) {
             if (blockedColumns.length > 0) {
                 blockedColumns.forEach(v => {
-                    nonEditableColumns.push({columnName: v.replace(/\ \/g, ""), editingEnabled: false});
+                    nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
                 });
             }
         }
@@ -235,7 +241,7 @@ class GridComponent extends Component {
 
             //Additional grid configurations
             columnLabels, columnOrder: columns,
-            columnWidths, columnReordering, editingMode,
+            colWidths, columnReordering, editingMode,
             pageSize, pageSizes,
             selectionToggled,
 
@@ -262,12 +268,13 @@ class GridComponent extends Component {
         if (this.props.columns !== prevProps.columns || this.props.rows !== prevProps.rows) {
             const {
                 columns, rows, pageConfig, toggleSelect, viewConfig, colReorder, blockedColumns,
-                blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount
+                blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount,
+                columnWidths
             } = this.props;
 
             //Setting up the columns for rendering
             let gridColumns = columns.map(v => {
-                return {name: v.replace(/\ \/g, ""), title: v};
+                return {name: v.replace(/\s/g, ""), title: v};
             });
 
             //Setting up column labels to be used later by search component
@@ -279,8 +286,9 @@ class GridComponent extends Component {
                 let gridRow = {};
 
                 columns.forEach(p => {
-                    if (v.hasOwnProperty(p)) {
-                        gridRow[p.replace(/\ \/g, "")] = v[p];
+                    let property = p.replace(/\s/g, "");
+                    if (v.hasOwnProperty(property)) {
+                        gridRow[property] = v[property];
                     }
                 });
 
@@ -306,8 +314,12 @@ class GridComponent extends Component {
             }
 
             //Setting up initial widths for viewing
-            let columnWidths = columns.map(v => {
-                return {columnName: v.replace(/\ \/g, ""), width: 180};
+            let colWidths = columns.map(v => {
+                let property = v.replace(/\s/g, "");
+                if (columnWidths && columnWidths.hasOwnProperty(property))
+                    return {columnName: property, width: columnWidths[property]};
+                else
+                    return {columnName: property, width: 180};
             });
 
             //Checking if the developer opted to allow column reordering
@@ -331,7 +343,7 @@ class GridComponent extends Component {
             if (blockedColumns !== undefined) {
                 if (blockedColumns.length > 0) {
                     blockedColumns.forEach(v => {
-                        nonEditableColumns.push({columnName: v.replace(/\ \/g, ""), editingEnabled: false});
+                        nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
                     });
                 }
             }
@@ -364,7 +376,7 @@ class GridComponent extends Component {
 
                 //Additional grid configurations
                 columnLabels, columnOrder: columns,
-                columnWidths, columnReordering, editingMode,
+                colWidths, columnReordering, editingMode,
                 pageSize, pageSizes,
                 selectionToggled,
 
@@ -545,7 +557,7 @@ class GridComponent extends Component {
     render() {
         //Retrieving all state values
         const {
-            rows, columns, columnLabels, sorting, columnWidths, pageSize, pageSizes, currentPage,
+            rows, columns, columnLabels, sorting, colWidths, pageSize, pageSizes, currentPage,
             selection, selectionToggled, viewSetup, columnReordering, columnOrder, editingMode,
             deletionSelection, nonSearchableColumns, totalDataCount
         } = this.state;
@@ -721,27 +733,30 @@ class GridComponent extends Component {
             pagingPlugin = <IntegratedPaging/>;
         }
 
+        let menuBar;
+        if (viewSetup !== "bare"){
+            menuBar = <Container fluid={true} style={{marginRight: 1}}>
+                <Row noGutters={true}>
+                    <Col>
+                        {menuOptions}
+                    </Col>
+
+                    <Col xs="auto" style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
+                        {refresh}
+                    </Col>
+                </Row>
+                <Row noGutters={true} style={{paddingTop: 5}}>
+                    {deleteSelected}
+                    {deleteHint}
+                </Row>
+            </Container>;
+        }
+
 
         return (
             <div style={{fontSize: '12px'}}>
-
                 {/*=============================== Menu Bar Portion ===============================*/}
-
-                <Container fluid={true} style={{marginRight: 1}}>
-                    <Row noGutters={true}>
-                        <Col>
-                            {menuOptions}
-                        </Col>
-
-                        <Col xs="auto" style={{float: 'right', textAlign: 'right', marginRight: '0px'}}>
-                            {refresh}
-                        </Col>
-                    </Row>
-                    <Row noGutters={true} style={{paddingTop: 5}}>
-                        {deleteSelected}
-                        {deleteHint}
-                    </Row>
-                </Container>
+                {menuBar}
 
                 {/*=============================== Grid Portion ===============================*/}
                 <Grid
@@ -782,7 +797,7 @@ class GridComponent extends Component {
                     />
 
                     <TableColumnResizing
-                        columnWidths={columnWidths}
+                        columnWidths={colWidths}
                         onColumnWidthsChange={this.changeColumnWidths}
                     />
 
@@ -818,7 +833,7 @@ GridComponent.propTypes = {
     columns: PropTypes.array.isRequired,
 
     /**
-     <b>Description:</b> The list of rows (data) for the given grid.
+     <b>Description:</b> The list of rows (data) for the given grid. <b><i> Object keys must match the column names (case-sensitive) without spaces. </i></b>
      <i> Note: for proper sorting behavior, ensure to pass numbers as column values for number-typed columns. </i>
 
      <b>Value:</b> Json array whose keys corresponds to the columns prop.
@@ -828,11 +843,27 @@ GridComponent.propTypes = {
      ]
      <b>Example: </b>
      [
-     {"First Name": "John", "Last Name": "Doe", "Age": 24},
-     {"First Name": "Jane", "Last Name": "Doe", "Age": 19},
+     {"FirstName": "John", "LastName": "Doe", "Age": 24},
+     {"FirstName": "Jane", "LastName": "Doe", "Age": 19},
      ]
      */
     rows: PropTypes.array.isRequired,
+
+    /**
+     <b>Description:</b> The specified column widths for each column. If not specified, the default will be applied.
+
+     <b>Value:</b> Json object whose keys corresponds to the columns prop.
+     [
+     {<name of column>: <column width>, <next column>: <column width>, ...},
+     ...
+     ]
+
+     <b>Default:</b> 180
+
+     <b>Example: </b>
+     {"FirstName": 150, "LastName": 150, "Age": 50},
+     */
+    columnWidths: PropTypes.number,
 
     /**
      <b>Description:</b> Toggles a particular grid setup such as showing the grid only/grid + refresh button/grid + refresh + search, etc.
