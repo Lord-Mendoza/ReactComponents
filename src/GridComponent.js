@@ -8,32 +8,32 @@ Lord Mendoza - 4/19/19
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import './GridComponent.css';
-
 //DevExpress Grid
 import {
-    EditingState,
-    IntegratedPaging, IntegratedSelection,
+    CustomPaging,
+    EditingState, FilteringState, IntegratedFiltering,
+    IntegratedPaging,
+    IntegratedSelection,
     IntegratedSorting,
     PagingState,
-    CustomPaging,
     SelectionState,
     SortingState
 } from "@devexpress/dx-react-grid";
 import {
-    Grid, PagingPanel, DragDropProvider,
-    Table, TableColumnResizing,
-    TableHeaderRow, TableSelection, TableColumnReordering, TableEditColumn, TableEditRow,
+    DragDropProvider,
+    Grid,
+    PagingPanel,
+    Table,
+    TableColumnReordering,
+    TableColumnResizing,
+    TableEditColumn,
+    TableEditRow,
+    TableHeaderRow,
+    TableSelection,
 } from '@devexpress/dx-react-grid-bootstrap4';
 import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
-
 //React-Bootstrap
-import {
-    Button, ButtonToolbar,
-    Col,
-    Container, Form,
-    OverlayTrigger, Popover,
-    Row
-} from "react-bootstrap";
+import {Button, ButtonToolbar, Col, Container, Form, OverlayTrigger, Popover, Row} from "react-bootstrap";
 import {FaPlus, FaQuestion, FaRedo, FaSearch, FaSlidersH, FaSync, FaTrash} from "react-icons/fa";
 
 
@@ -53,6 +53,14 @@ const TableComponent = ({...restProps}) => (
 class GridComponent extends Component {
     constructor(props, context) {
         super(props, context);
+
+        let filterByColumnEnabled;
+        if (props.hasOwnProperty("filterByColumnEnabled"))
+            filterByColumnEnabled = props["filterByColumnEnabled"];
+
+        let tableCell;
+        if (props.hasOwnProperty("tableCell"))
+            tableCell = props["tableCell"];
 
         //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
@@ -75,6 +83,9 @@ class GridComponent extends Component {
             nonSearchableColumns: [],
             searchValue: "",
             searchColumn: "default",
+
+            filterByColumnEnabled,
+            tableCell
         };
 
         //In-line methods that is better to be declared here rather than outside the constructor (since its simple)
@@ -139,7 +150,7 @@ class GridComponent extends Component {
 
         //Setting up the columns for rendering
         let gridColumns = columns.map(v => {
-            return {name: v.replace(/\s/g, ""), title: v};
+            return {name: v.replace(/\s/g, "").replace(/[\W_]+/g,""), title: v};
         });
 
         //Setting up column labels to be used later by search component
@@ -151,7 +162,7 @@ class GridComponent extends Component {
             let gridRow = {};
 
             columns.forEach(p => {
-                let property = p.replace(/\s/g, "");
+                let property = p.replace(/\s/g, "").replace(/[\W_]+/g,"");
                 if (v.hasOwnProperty(property)) {
                     gridRow[property] = v[property];
                 }
@@ -180,7 +191,7 @@ class GridComponent extends Component {
 
         //Setting up initial widths for viewing
         let colWidths = columns.map(v => {
-            let property = v.replace(/\s/g, "");
+            let property = v.replace(/\s/g, "").replace(/[\W_]+/g,"");
             if (columnWidths && columnWidths.hasOwnProperty(property))
                 return {columnName: property, width: columnWidths[property]};
             else
@@ -208,7 +219,7 @@ class GridComponent extends Component {
         if (blockedColumns !== undefined) {
             if (blockedColumns.length > 0) {
                 blockedColumns.forEach(v => {
-                    nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
+                    nonEditableColumns.push({columnName: v.replace(/\s/g, "").replace(/[\W_]+/g,""), editingEnabled: false});
                 });
             }
         }
@@ -265,7 +276,7 @@ class GridComponent extends Component {
     (new data is loaded, new columns) then the GridComponent's state is re-initialized again
      */
     componentDidUpdate(prevProps) {
-        if (this.props.columns !== prevProps.columns || this.props.rows !== prevProps.rows) {
+        if (this.props.columns !== prevProps.columns || this.props.rows !== prevProps.rows || (this.props.filterByColumnEnabled && this.props.filterArray !== prevProps.filterArray)) {
             const {
                 columns, rows, pageConfig, toggleSelect, viewConfig, colReorder, blockedColumns,
                 blockedSearchColumns, remotePaging, currentPage, currentPageSize, totalCount,
@@ -274,7 +285,7 @@ class GridComponent extends Component {
 
             //Setting up the columns for rendering
             let gridColumns = columns.map(v => {
-                return {name: v.replace(/\s/g, ""), title: v};
+                return {name: v.replace(/\s/g, "").replace(/[\W_]+/g,""), title: v};
             });
 
             //Setting up column labels to be used later by search component
@@ -286,7 +297,7 @@ class GridComponent extends Component {
                 let gridRow = {};
 
                 columns.forEach(p => {
-                    let property = p.replace(/\s/g, "");
+                    let property = p.replace(/\s/g, "").replace(/[\W_]+/g,"");
                     if (v.hasOwnProperty(property)) {
                         gridRow[property] = v[property];
                     }
@@ -315,7 +326,7 @@ class GridComponent extends Component {
 
             //Setting up initial widths for viewing
             let colWidths = columns.map(v => {
-                let property = v.replace(/\s/g, "");
+                let property = v.replace(/\s/g, "").replace(/[\W_]+/g,"");
                 if (columnWidths && columnWidths.hasOwnProperty(property))
                     return {columnName: property, width: columnWidths[property]};
                 else
@@ -343,7 +354,7 @@ class GridComponent extends Component {
             if (blockedColumns !== undefined) {
                 if (blockedColumns.length > 0) {
                     blockedColumns.forEach(v => {
-                        nonEditableColumns.push({columnName: v.replace(/\s/g, ""), editingEnabled: false});
+                        nonEditableColumns.push({columnName: v.replace(/\s/g, "").replace(/[\W_]+/g,""), editingEnabled: false});
                     });
                 }
             }
@@ -365,6 +376,13 @@ class GridComponent extends Component {
                 totalDataCount = totalCount;
             }
 
+            //Retrieving the search value as the user types
+            let filterArray;
+            if (this.props.filterArray)
+                filterArray = this.props.filterArray;
+            else
+                filterArray = [];
+
             //Initializing other state props
             let editingMode = false;
             let searchValue = "";
@@ -385,7 +403,7 @@ class GridComponent extends Component {
 
                 //Tracking which rows are deleted/edited/search to be passed back to parent component
                 deletionSelection: [], editingRowIds: [], rowChanges: [],
-                searchValue, searchColumn,
+                searchValue, searchColumn, filterArray,
 
                 //Configuring the search component
                 editingStateColumnExtensions: nonEditableColumns, nonSearchableColumns,
@@ -559,7 +577,8 @@ class GridComponent extends Component {
         const {
             rows, columns, columnLabels, sorting, colWidths, pageSize, pageSizes, currentPage,
             selection, selectionToggled, viewSetup, columnReordering, columnOrder, editingMode,
-            deletionSelection, nonSearchableColumns, totalDataCount
+            deletionSelection, nonSearchableColumns, totalDataCount, filterByColumnEnabled, filterArray,
+            tableCell
         } = this.state;
 
         //Determining whether to display the select checkboxes to the left of the rows or not
@@ -685,13 +704,13 @@ class GridComponent extends Component {
                             onClick={this.resetSearch}> <FaRedo/> </Button>
                 </Form>;
 
-            //Else if search components are not toggled, then they will be hidden
+                //Else if search components are not toggled, then they will be hidden
             } else if (viewSetup === "allnosearch") {
                 menuOptions = <Form inline="true">
                     {btnAdd} {btnEdit}
                 </Form>;
 
-            //Otherwise, render everything
+                //Otherwise, render everything
             } else if (viewSetup === "all") {
                 menuOptions = <Form inline="true">
                     <Form.Group>
@@ -752,6 +771,25 @@ class GridComponent extends Component {
             </Container>;
         }
 
+        let filteringState, integratedFiltering;
+        if (filterByColumnEnabled) {
+            filteringState = <FilteringState
+                    filters={filterArray}
+                />;
+            integratedFiltering = <IntegratedFiltering />;
+        }
+
+        let table = <Table
+            tableComponent={TableComponent}
+        />;
+
+        if (tableCell) {
+            table = <Table
+                tableComponent={TableComponent}
+                cellComponent={tableCell}
+            />;
+        }
+
 
         return (
             <div style={{fontSize: '12px'}}>
@@ -791,10 +829,11 @@ class GridComponent extends Component {
                     {integratedSelection}
                     {pagingPlugin}
 
+                    {filteringState}
+                    {integratedFiltering}
+
                     <IntegratedSorting/>
-                    <Table
-                        tableComponent={TableComponent}
-                    />
+                    {table}
 
                     <TableColumnResizing
                         columnWidths={colWidths}
@@ -833,7 +872,7 @@ GridComponent.propTypes = {
     columns: PropTypes.array.isRequired,
 
     /**
-     <b>Description:</b> The list of rows (data) for the given grid. <b><i> Object keys must match the column names (case-sensitive) without spaces. </i></b>
+     <b>Description:</b> The list of rows (data) for the given grid. <b><i> Object keys must match the column names (case-sensitive) without spaces. Also symbols must be omitted from the keys.</i></b>
      <i> Note: for proper sorting behavior, ensure to pass numbers as column values for number-typed columns. </i>
 
      <b>Value:</b> Json array whose keys corresponds to the columns prop.
@@ -850,7 +889,7 @@ GridComponent.propTypes = {
     rows: PropTypes.array.isRequired,
 
     /**
-     <b>Description:</b> The specified column widths for each column. If not specified, the default will be applied.
+     <b>Description:</b> The specified column widths for each column. If not specified, the default will be applied. <b><i> Object keys must match the column names (case-sensitive) without spaces. Also symbols must be omitted from the keys.</i></b>
 
      <b>Value:</b> Json object whose keys corresponds to the columns prop.
      [
@@ -863,7 +902,7 @@ GridComponent.propTypes = {
      <b>Example: </b>
      {"FirstName": 150, "LastName": 150, "Age": 50},
      */
-    columnWidths: PropTypes.number,
+    columnWidths: PropTypes.object,
 
     /**
      <b>Description:</b> Toggles a particular grid setup such as showing the grid only/grid + refresh button/grid + refresh + search, etc.
