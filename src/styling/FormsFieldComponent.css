@@ -1,0 +1,69 @@
+.inline.equal.width.fields.formFields {
+    height: 35px;
+    margin-bottom: 0;
+}
+
+.inline.equal.width.fields.formFields label.dateField {
+    margin-top: 6px !important;
+}
+
+.inline.equal.width.fields.formFields label:not(.dateField) {
+    margin-top: 3px !important;
+}
+
+.inline.equal.width.fields.formFields label {
+    float: left;
+}
+
+.inline.equal.width.fields.formFields .react-datepicker-wrapper input[type="text"] {
+    padding: 7px;
+}
+
+.inline.equal.width.fields.formFields input {
+    padding-left: 9px;
+}
+
+.formFieldsCol.col-6 .inline.equal.width.fields.formFields .ui.input,
+.formFieldsCol.col-6 .react-datepicker-wrapper,
+.formFieldsCol.col-6 button.ui.mini.compact.fluid.button {
+    float: right;
+    width: 174px !important;
+    height: 30px;
+    margin-right: 3px;
+}
+
+.formFieldsCol.col-4 .inline.equal.width.fields.formFields .ui.input,
+.formFieldsCol.col-4 .react-datepicker-wrapper,
+.formFieldsCol.col-4 button.ui.mini.compact.fluid.button {
+    float: right;
+    width: 160px !important;
+    height: 30px;
+    margin-right: 3px;
+}
+
+.formFieldsCol.col-3 .inline.equal.width.fields.formFields .ui.input,
+.formFieldsCol.col-3 .react-datepicker-wrapper,
+.formFieldsCol.col-3 button.ui.mini.compact.fluid.button {
+    float: right;
+    width: 146px !important;
+    height: 30px;
+    margin-right: 3px;
+}
+
+.formFieldsCol.col-3 .inline.equal.width.fields.formFields input[type="date"] {
+    padding-left: 8px;
+}
+
+/*.formFieldsCol .react-datepicker-wrapper {*/
+/*    width: 174px !important;*/
+/*    height: 30px;*/
+/*    margin-left: 3px;*/
+/*}*/
+
+div.ui.selection.dropdown{
+    padding: 5px;
+}
+
+.react-datepicker {
+    z-index: 1000;
+}

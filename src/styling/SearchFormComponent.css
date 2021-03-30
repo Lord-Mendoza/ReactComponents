@@ -1,0 +1,89 @@
+div.ui.divider.searchDivider-2 {
+    max-width: 600px;
+    margin: 10px 0 10px 5px !important;
+}
+
+div.ui.divider.searchDivider-3 {
+    max-width: 900px;
+    margin: 10px 0 10px 5px !important;
+}
+
+.ui.dropdown.searchMenu [role="listbox"] > i.dropdown.icon {
+    float: right;
+}
+
+.ui.dropdown.searchMenu [role="listbox"] span.text {
+    line-height: normal;
+}
+
+.ui.dropdown.searchMenu {
+    display: block;
+    padding: 10px 10px 0 10px !important;
+}
+
+a.nav-link img,
+.ui.dropdown.searchMenu img {
+    margin-right: 5px !important;
+}
+
+.ui.dropdown.searchMenu .right.menu.transition.visible .item {
+    padding: 8px 15px !important;
+}
+
+.ui.dropdown.searchMenu .right.menu.transition.visible img {
+    margin-right: 10px !important;
+    height: 16px;
+    width: 16px;
+}
+
+.right.menu.transition.visible .ui.dropdown {
+    padding-bottom: 10px !important;
+}
+
+.right.menu.transition.visible img {
+    margin: auto;
+}
+
+.right.menu.transition.visible .ui.dropdown.searchMenu span.text {
+    margin-left: 5px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 14px;
+}
+
+.ui.dropdown.searchMenu span.text:not(.right.menu.transition.visible span.text) {
+    color: rgba(0,0,0,.5) !important;
+}
+
+.right.menu.transition.visible span.text {
+    font-weight: 400;
+}
+
+.ui.popup.transition.visible.tableCellPopup {
+    padding: 5px
+}
+
+.ui.popup.transition.visible.tableCellPopup .item {
+    padding: 5px 10px;
+}
+
+.item:hover {
+    background-color: #EDEDED;
+}
+
+.searchGrid i.caret.square.down.icon:hover {
+    cursor: pointer;
+}
+
+.searchFormTableCellPopup .modal-body {
+    padding: 0;
+    border: 0;
+}
+
+.fade.searchFormTableCellPopup.materialHistoryPopup.modal.show .modal-dialog.modal-dialog-centered {
+    max-width: 1500px;
+}
+
+.searchGrid i.icon {
+    display: inline !important;
+}

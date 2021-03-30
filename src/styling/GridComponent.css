@@ -1,0 +1,75 @@
+table.table.dx-g-bs4-table.table-striped{
+    margin: 0;
+    min-width: inherit !important;
+}
+
+thead{
+    line-height: 1;
+}
+
+tbody{
+    line-height: 0;
+}
+
+nav.navbar.navbar-expand{
+    padding: 0;
+    line-height: 0;
+}
+
+.dropdown-toggle::after{
+    display: none !important;
+}
+
+button.btn {
+    font-size: 12px;
+}
+
+div.container-fluid {
+    padding: 5px;
+}
+
+button.btn.btn-outline-dark {
+    padding: 5px;
+}
+
+td.text-center.align-middle{
+    padding: 0;
+}
+
+.col-auto{
+    flex: auto;
+}
+
+button#edit.btn.btn-link.dx-g-bs4-table-edit-command-cell{
+    border: 0;
+    padding: 0;
+}
+
+input.form-control.w-100{
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+td.text-center.p-0.text-nowrap{
+    vertical-align: middle;
+}
+
+th.position-relative.dx-g-bs4-header-cell.text-nowrap{
+    line-height: normal !important;
+}
+
+.ml-2, .mx-2 {
+    font-weight: bold;
+}
+
+i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-bottom {
+    background: url('../images/chevron-down-solid.png') no-repeat;
+    padding: 7px 0 !important;
+    margin-bottom: -6px !important;
+}
+
+i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-right {
+    background: url('../images/chevron-right-solid.png') no-repeat;
+    padding: 7px 0 !important;
+    margin-bottom: -8px !important;
+}
