@@ -1388,7 +1388,7 @@ GridComponent.propTypes = {
     columns: PropTypes.arrayOf(PropTypes.exact({
         name: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired
-    })),
+    })).isRequired,
 
     /**
      <b>Description:</b> The list of rows (data) for the given grid. <b><i> Object keys must match the column names (case-sensitive) without spaces. Also symbols must be omitted from the keys.</i></b>
