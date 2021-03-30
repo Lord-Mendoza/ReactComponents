@@ -1385,14 +1385,10 @@ class GridComponent extends React.Component {
 //=========================================== DOCUMENTATIONS ===========================================================
 
 GridComponent.propTypes = {
-    /**
-     <b>Description:</b> The list of columns for the given grid.
-     <b>Value:</b> array of strings
-     [ "<name of column>", "<next column name>", ... ]
-     <b>Example: </b>
-     ["First Name", "Last Name", "Age"]
-     */
-    columns: PropTypes.array.isRequired,
+    columns: PropTypes.arrayOf(PropTypes.exact({
+        name: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired
+    })),
 
     /**
      <b>Description:</b> The list of rows (data) for the given grid. <b><i> Object keys must match the column names (case-sensitive) without spaces. Also symbols must be omitted from the keys.</i></b>
@@ -1409,7 +1405,16 @@ GridComponent.propTypes = {
      {"FirstName": "Jane", "LastName": "Doe", "Age": 19},
      ]
      */
-    rows: PropTypes.array.isRequired,
+    rows: PropTypes.arrayOf(
+        PropTypes.objectOf(
+            PropTypes.oneOfType([
+                PropTypes.string,
+                PropTypes.number
+            ])
+        )
+    ).isRequired,
+
+    disableModifications: PropTypes.bool,
 
     /**
      <b>Description:</b> The specified column widths for each column. If not specified, the default will be applied. <b><i> Object keys must match the column names (case-sensitive) without spaces. Also symbols must be omitted from the keys.</i></b>
@@ -1425,7 +1430,7 @@ GridComponent.propTypes = {
      <b>Example: </b>
      {"FirstName": 150, "LastName": 150, "Age": 50},
      */
-    columnWidths: PropTypes.object,
+    columnWidths: PropTypes.objectOf(PropTypes.number),
 
     /**
      <b>Description:</b> Toggles a particular grid setup such as showing the grid only/grid + refresh button/grid + refresh + search, etc.
@@ -1439,7 +1444,13 @@ GridComponent.propTypes = {
 
      <b>Default:</b> "simple"
      */
-    viewConfig: PropTypes.string,
+    viewConfig: PropTypes.oneOf([
+        'bare',
+        'simple',
+        'search',
+        'all',
+        'allnosearch'
+    ]),
 
     /**
      <b>Description:</b> Toggles whether to show the select buttons on the left side of the rows for external manipulation. If set to true, then selectValues prop *needs* to exist & have a callback function set to it, otherwise the select buttons will NOT render. It will also not render if "viewConfig" is set to "all" or "allnosearch".
@@ -1604,6 +1615,19 @@ GridComponent.propTypes = {
         }
     },
 
+    changeCurrentPage: function(props, propName) {
+        if ((props['remotePaging'] === true) && props[propName] === undefined){
+            return new Error(
+                'Setting remotePaging prop to true requires for changeCurrentPage to be defined.'
+            );
+        }
+        else if ((props['remotePaging'] === true) && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'changeCurrentPage requires a function as value.'
+            );
+        }
+    },
+
     /**
      <b>Description:</b> Required when remotePaging is toggled to true; this lets GridComponent know which pageSize to toggle as selected.
      <b>Value:</b> Callback function.
@@ -1620,6 +1644,214 @@ GridComponent.propTypes = {
             );
         }
     },
+
+    changeCurrentPageSize: function(props, propName) {
+        if ((props['remotePaging'] === true) && props[propName] === undefined){
+            return new Error(
+                'Setting remotePaging prop to true requires for changeCurrentPageSize to be defined.'
+            );
+        }
+        else if ((props['remotePaging'] === true) && (typeof props[propName] !== 'function') ){
+            return new Error(
+                'changeCurrentPageSize requires a function as value.'
+            );
+        }
+    },
+
+    editExternally: PropTypes.bool,
+    editToggled: function(props, propName) {
+        if (props['editExternally'] === true && props[propName] === undefined){
+            return new Error(
+                'Setting editExternally prop to true requires for editToggled to be defined.'
+            );
+        }
+        else if (props['editExternally'] === true && (typeof props[propName] !== 'function')){
+            return new Error(
+                'editToggled requires a function as value.'
+            );
+        }
+    },
+
+    hideOnSubmit: PropTypes.bool,
+
+    clearDeletedRows: PropTypes.bool,
+    revertClearDeletedRows: function(props, propName) {
+        if (props['clearDeletedRows'] === true && props[propName] === undefined){
+            return new Error(
+                'Setting clearDeletedRows prop to true requires for revertClearDeletedRows to be defined.'
+            );
+        }
+        else if (props['clearDeletedRows'] === true && (typeof props[propName] !== 'function')){
+            return new Error(
+                'revertClearDeletedRows requires a function as value.'
+            );
+        }
+    },
+
+    resetSelections: PropTypes.bool,
+    selectionsWereReset: function(props, propName) {
+        if (props['resetSelections'] === true && props[propName] === undefined){
+            return new Error(
+                'Setting resetSelections prop to true requires for selectionsWereReset to be defined.'
+            );
+        }
+        else if (props['resetSelections'] === true && (typeof props[propName] !== 'function')){
+            return new Error(
+                'selectionsWereReset requires a function as value.'
+            );
+        }
+    },
+
+    searchValue: function(props, propName) {
+        if (props['viewConfig'] === "all" && props[propName] === undefined){
+            return new Error(
+                'Setting viewConfig prop to "all" requires for searchValue to be defined.'
+            );
+        }
+        else if (props['viewConfig'] === "all" && (typeof props[propName] !== 'function')){
+            return new Error(
+                'searchValue requires a function as value.'
+            );
+        }
+    },
+
+    resetSearch: PropTypes.bool,
+    revertResetSearch: function(props, propName) {
+        if (props['resetSearch'] === true && props[propName] === undefined){
+            return new Error(
+                'Setting resetSearch prop to true requires for revertResetSearch to be defined.'
+            );
+        }
+        else if (props['resetSearch'] === true && (typeof props[propName] !== 'function')){
+            return new Error(
+                'revertResetSearch requires a function as value.'
+            );
+        }
+    },
+
+    filterByColumnEnabled: PropTypes.bool,
+    filterArray: function(props, propName) {
+        if (props['filterByColumnEnabled'] === true){
+            if (props[propName] === undefined) {
+                return new Error(
+                    'Setting filterByColumnEnabled prop to true requires for filterArray to be defined.'
+                );
+            } else {
+                return PropTypes.arrayOf(PropTypes.exact({
+                    columnName: PropTypes.string.isRequired,
+                    value: PropTypes.oneOfType([
+                        PropTypes.string,
+                        PropTypes.number
+                    ]).isRequired
+                }))
+            }
+        }
+    },
+
+    groupsEnabled: PropTypes.bool,
+    groupBy: function(props, propName) {
+        if (props['groupsEnabled'] === true) {
+            if (props[propName] === undefined) {
+                return new Error(
+                    'Setting groupsEnabled prop to true requires for groupBy to be defined.'
+                );
+            } else {
+                return PropTypes.oneOfType([
+                    PropTypes.array,
+                    PropTypes.string
+                ]).isRequired
+            }
+        }
+    },
+
+    summaryItemsEnabled: PropTypes.bool,
+    summaryItems: function(props, propName) {
+        if (props['summaryItemsEnabled'] === true) {
+            if (props[propName] === undefined) {
+                return new Error(
+                    'Setting summaryItemsEnabled prop to true requires for summaryItems to be defined.'
+                );
+            } else {
+                return PropTypes.arrayOf(
+                    PropTypes.exact({
+                        columnName: PropTypes.string.isRequired,
+                        type: PropTypes.oneOf([
+                            'sum',
+                            'max',
+                            'min',
+                            'avg',
+                            'count'
+                        ])
+                    })
+                ).isRequired
+            }
+        }
+    },
+
+    summaryIsCustomized: PropTypes.bool,
+    summaryValue: function(props, propName) {
+        if (props['summaryIsCustomized'] === true) {
+            if (props[propName] === undefined) {
+                return new Error(
+                    'Setting summaryIsCustomized prop to true requires for summaryValue to be defined.'
+                );
+            } else {
+                return PropTypes.oneOfType([
+                    PropTypes.string,
+                    PropTypes.number
+                ]).isRequired
+            }
+        }
+    },
+
+    gridSorting: PropTypes.arrayOf(
+        PropTypes.objectOf(
+            PropTypes.oneOf([
+                'asc',
+                'desc'
+            ])
+        )
+    ),
+
+    sortingColumnExtensions: PropTypes.arrayOf(
+        PropTypes.exact({
+            columnName: PropTypes.string.isRequired,
+            compare: PropTypes.func.isRequired
+        })
+    ),
+
+    remoteSorting: PropTypes.bool,
+    selectedSorting: function(props, propName) {
+        if (props['remoteSorting'] === true) {
+            if (props[propName] === undefined) {
+                return new Error(
+                    'Setting remoteSorting prop to true requires for selectedSorting to be defined.'
+                );
+            } else {
+                return PropTypes.func.isRequired
+            }
+        }
+    },
+
+    hiddenColumns: PropTypes.arrayOf(PropTypes.string),
+
+    buttonColors: PropTypes.exact(({
+        createColor: PropTypes.string,
+        createTextColor: PropTypes.string,
+
+        editColor: PropTypes.string,
+        editTextColor: PropTypes.string,
+
+        deleteColor: PropTypes.string,
+        deleteTextColor: PropTypes.string,
+
+        refreshColor: PropTypes.string,
+        refreshTextColor: PropTypes.string,
+    })),
+
+    gridContainerClass: PropTypes.string,
+    showPagingPanel: PropTypes.bool,
+    tableCell: PropTypes.element
 };
 
 export default GridComponent;
