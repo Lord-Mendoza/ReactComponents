@@ -80,10 +80,6 @@ a.nav-link img,
     border: 0;
 }
 
-.fade.searchFormTableCellPopup.materialHistoryPopup.modal.show .modal-dialog.modal-dialog-centered {
-    max-width: 1500px;
-}
-
 .searchGrid i.icon {
     display: inline !important;
 }
