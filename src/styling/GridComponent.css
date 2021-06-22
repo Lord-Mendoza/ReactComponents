@@ -7,7 +7,7 @@ thead{
     line-height: 1;
 }
 
-tbody{
+tbody {
     line-height: 0;
 }
 
@@ -63,13 +63,155 @@ th.position-relative.dx-g-bs4-header-cell.text-nowrap{
 }
 
 i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-bottom {
-    background: url('../images/chevron-down-solid.png') no-repeat;
-    padding: 7px 0 !important;
-    margin-bottom: -6px !important;
+    background: url('../../images/chevron-down-solid.png') no-repeat;
+    margin-bottom: -11px !important;
 }
 
 i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-right {
-    background: url('../images/chevron-right-solid.png') no-repeat;
-    padding: 7px 0 !important;
+    background: url('../../images/chevron-right-solid.png') no-repeat;
+    margin-bottom: -13px !important;
+}
+
+span.oi.dx-g-bs4-sorting-indicator.mx-2.oi-arrow-thick-top {
+    background: url('../../images/arrow-up-solid.png') no-repeat;
+    height: 8px;
+    width: 8px;
+    margin-top: 2px;
+}
+
+span.oi.dx-g-bs4-sorting-indicator.mx-2.oi-arrow-thick-bottom {
+    background: url('../../images/arrow-down-solid.png') no-repeat;
+    height: 8px;
+    width: 8px;
+    margin-top: 2px;
+}
+
+tr.dx-g-bs4-cursor-pointer {
+    background-color: #C1D2E6 !important;
+    border-color: #91B2DB !important;
+}
+
+.table-responsive.dx-g-bs4-table-container {
+    max-width: var(--grid-max-width);
+    max-height: var(--grid-max-height);
+}
+
+/*Fixes issue with rows looking weird with a treeData*/
+.dx-g-bs4-table-tree-content {
+    line-height: initial;
+    margin: -8px 0;
+}
+
+/*Fixes issue with tree arrows being unaligned for tree data*/
+td.text-center.align-middle i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-bottom {
+    background: url('../../images/chevron-down-solid.png') no-repeat;
+    margin-bottom: -6px !important;
+}
+
+td.text-center.align-middle i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-right {
+    background: url('../../images/chevron-right-solid.png') no-repeat;
     margin-bottom: -8px !important;
+}
+
+/* For the filtering toolbar appearance*/
+.py-2.d-flex.position-relative.dx-g-bs4-toolbar input.form-control.w-25 {
+    width: 15% !important
+}
+
+.d-flex.flex-column .card-header.py-2.d-flex.position-relative.dx-g-bs4-toolbar {
+    padding-top: 5px !important;
+    padding-bottom: 0 !important;
+    align-items: baseline;
+    margin-bottom: -10px;
+    border-bottom: none;
+    padding-right: 5px;
+}
+
+/*Fixing issue with grouping arrows being unaligned for grouped data*/
+td.dx-g-bs4-group-cell.text-nowrap i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-bottom {
+    background: url('../../images/chevron-down-solid.png') no-repeat;
+    margin-bottom: -6px !important;
+}
+
+td.dx-g-bs4-group-cell.text-nowrap i.oi.p-2.text-center.dx-g-bs4-toggle-button.oi-chevron-right {
+    background: url('../../images/chevron-right-solid.png') no-repeat;
+    margin-bottom: -6px !important;
+}
+
+/*Total H5 Styling*/
+.totalText {
+    margin: auto;
+    float: right;
+    padding-right: 20px;
+    padding-top: 5px;
+}
+
+/*Refresh, Export, and Total Count Panel*/
+.refreshExportTotalPanel {
+    padding: 5px 0 0 1.25rem;
+    background-color: rgba(0,0,0,.02);
+    border: 1px solid rgb(222, 226, 230);
+    border-top: 0;
+    height: 40px;
+    border-bottom-left-radius: calc(0.25rem - 1px);
+    border-bottom-right-radius: calc(0.25rem - 1px);
+}
+
+/*Paging Panel*/
+.clearfix.card-footer.dx-g-bs4-paging-panel {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: 1px solid rgb(222, 226, 230);
+    border-bottom-color: rgb(0,0,0,.1);
+    border-radius: 0;
+}
+
+/*New-Edit-Delete Buttons*/
+button.dx-g-bs4-table-edit-command-cell {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.table thead th {
+    vertical-align: middle !important;
+}
+
+/*Date Picker when editing*/
+.gridDatePicker .react-datepicker-wrapper {
+    height: unset;
+}
+
+.gridDatePicker span.react-datepicker__month-read-view--down-arrow,
+.gridDatePicker span.react-datepicker__year-read-view--down-arrow {
+    top: -2px !important;
+}
+
+.gridDatePicker .react-datepicker__month-read-view {
+    padding: 5px;
+}
+
+.gridDatePicker .react-datepicker__today-button {
+    padding: 15px;
+}
+
+.gridDatePicker .react-datepicker__month-dropdown-container.react-datepicker__month-dropdown-container--scroll {
+    padding: 5px;
+}
+
+.gridDatePicker .react-datepicker__current-month.react-datepicker__current-month--hasYearDropdown.react-datepicker__current-month--hasMonthDropdown {
+    padding: 10px;
+}
+
+/*Input Fields when editing*/
+.gridInputField .ui.input {
+    height: var(--edit-field-height) !important;
+    margin-top: -2px;
+}
+
+.gridInputField input {
+    text-align: right !important;
+}
+
+input.form-control.w-100 {
+    height: var(--edit-field-height) !important;
 }

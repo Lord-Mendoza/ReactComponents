@@ -1,3 +1,5 @@
+import flatten from 'flat';
+
 export const isNotAnEmptyObject = (val) => {
     return val !== undefined && val !== null
         && typeof val === "object" && Object.keys(val).length > 0;
@@ -8,9 +10,12 @@ export const isAnEmptyObject = (val) => {
 }
 
 export const isSameObject = (objOne, objTwo) => {
-    if (isNotAnEmptyObject(objOne) && isNotAnEmptyObject(objTwo))
-        return JSON.stringify(objOne, Object.keys(objOne).sort()) === JSON.stringify(objTwo, Object.keys(objTwo).sort())
-    else if (isAnEmptyObject(objOne) && isAnEmptyObject(objTwo))
+    if (isNotAnEmptyObject(objOne) && isNotAnEmptyObject(objTwo)) {
+        let objOneFlattened = flatten(objOne, {maxDepth: 5});
+        let objTwoFlattened = flatten(objTwo, {maxDepth: 5});
+
+        return JSON.stringify(objOneFlattened, Object.keys(objOneFlattened).sort()) === JSON.stringify(objTwoFlattened, Object.keys(objTwoFlattened).sort())
+    } else if (isAnEmptyObject(objOne) && isAnEmptyObject(objTwo))
         return false;
     else if (isAnEmptyObject(objOne) && isNotAnEmptyObject(objTwo))
         return false;
