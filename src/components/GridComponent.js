@@ -4,7 +4,7 @@ import Moment from "moment";
 import {Button, Form, Icon, Popup} from "semantic-ui-react";
 
 //Styling
-import "../../styling/GridComponent.css";
+import "../styling/GridComponent.css";
 
 //Validators
 import {isNotEmptyString} from "../utilities/StringVariableValidators";
