@@ -1,6 +1,6 @@
 {
   "name": "reactwiki-components",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React components as described in https://reactwiki.com/",
   "main": "src/index.js",
   "scripts": {
