@@ -1,6 +1,6 @@
 {
-  "name": "reactwiki-components",
-  "version": "1.0.7",
+  "name": "react-wiki",
+  "version": "1.0.0",
   "description": "React components as described in https://reactwiki.com/",
   "main": "build/index.js",
   "scripts": {
@@ -62,6 +62,8 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.7.0",
+    "css-loader": "^5.2.6",
+    "file-loader": "^6.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.1",
     "webpack-cli": "^4.7.2"

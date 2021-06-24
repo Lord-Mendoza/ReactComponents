@@ -10,10 +10,10 @@ import Moment from 'moment';
 import {isNotAnEmptyObject} from "../utilities/ObjectVariableValidators";
 
 //Styling
-import "../styling/FormsFieldComponent.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'semantic-ui-css/semantic.min.css';
 import "react-datepicker/dist/react-datepicker.css";
-import "../styling/SearchFormComponent.css";
+import "../styling/FormsFieldComponent.css";
 
 
 function FormFieldsComponent(props) {

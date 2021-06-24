@@ -8,10 +8,13 @@ Lord Mendoza - 4/23/19
 import React from 'react';
 import PropTypes from "prop-types";
 import loading from '../images/upload.png';
-import '../styling/MaskComponent.css'
+
 //React-Bootstrap
 import {Col, Container, Image, Modal, Row} from "react-bootstrap";
+
+//Styling
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styling/MaskComponent.css'
 
 //======================================================================================================================
 //=================================== Constant Used for IE Compatibility ===============================================

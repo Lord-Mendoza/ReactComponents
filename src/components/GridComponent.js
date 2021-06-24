@@ -4,11 +4,10 @@ import Moment from "moment";
 import {Button, Form, Icon, Popup} from "semantic-ui-react";
 
 //Styling
-import "../styling/GridComponent.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'semantic-ui-css/semantic.min.css';
 import "react-datepicker/dist/react-datepicker.css";
-
+import "../styling/GridComponent.css";
 
 //Validators
 import {isNotEmptyString} from "../utilities/StringVariableValidators";
@@ -1014,7 +1013,7 @@ class depreciated_GridComponent extends React.Component {
                                 showConfirmationPopup: false,
                                 confirmationMessage: ""
                             })}
-                            show={showConfirmationPopup}
+                            show={showConfirmationPopup === true}
                             hasBodyPadding={true}
             />
         </div>)

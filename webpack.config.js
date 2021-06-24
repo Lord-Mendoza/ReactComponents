@@ -10,20 +10,28 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js?$/,
+                test: /\.js$|jsx/,
                 use: 'babel-loader',
+                exclude: /node_modules/
             },
             {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"]
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,
+                use: ['file-loader']
+            },
+            {
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
                 use: [
-                    {loader: 'file-loader'}
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'fonts/'
+                        }
+                    }
                 ]
             }
         ],
