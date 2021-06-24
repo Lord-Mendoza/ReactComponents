@@ -7,6 +7,7 @@ import {Button, Form, Icon, Popup} from "semantic-ui-react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'semantic-ui-css/semantic.min.css';
 import "react-datepicker/dist/react-datepicker.css";
+import "@devexpress/dx-react-grid-bootstrap4/dist/dx-react-grid-bootstrap4.css";
 import "../styling/GridComponent.css";
 
 //Validators
