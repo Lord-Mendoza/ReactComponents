@@ -11,6 +11,7 @@ import loading from '../images/upload.png';
 import '../styling/MaskComponent.css'
 //React-Bootstrap
 import {Col, Container, Image, Modal, Row} from "react-bootstrap";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 //======================================================================================================================
 //=================================== Constant Used for IE Compatibility ===============================================

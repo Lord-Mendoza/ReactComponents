@@ -11,6 +11,8 @@ import PropTypes from "prop-types";
 import {Button, Modal} from "react-bootstrap";
 //React-Icons
 import {FaCheck, FaRedo, FaTimes} from "react-icons/fa";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'semantic-ui-css/semantic.min.css';
 
 //======================================================================================================================
 //=================================== Constant Used for IE Compatibility ===============================================

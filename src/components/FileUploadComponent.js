@@ -12,6 +12,7 @@ import {useDropzone} from 'react-dropzone';
 import {Button, Container, Icon, Image} from "semantic-ui-react";
 //Styling
 import '../styling/FileUploadComponent.css';
+import 'semantic-ui-css/semantic.min.css';
 
 //======================================================================================================================
 //====================================== HELPER FUNCTION FOR UPLOAD ====================================================

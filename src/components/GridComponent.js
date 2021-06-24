@@ -5,7 +5,10 @@ import {Button, Form, Icon, Popup} from "semantic-ui-react";
 
 //Styling
 import "../styling/GridComponent.css";
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'semantic-ui-css/semantic.min.css';
+import "react-datepicker/dist/react-datepicker.css";
+
 
 //Validators
 import {isNotEmptyString} from "../utilities/StringVariableValidators";
@@ -68,7 +71,7 @@ import {FaCheck, FaTimes} from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 
-class GridComponent extends React.Component {
+class depreciated_GridComponent extends React.Component {
     constructor(props) {
         super(props);
 
@@ -1018,7 +1021,7 @@ class GridComponent extends React.Component {
     }
 }
 
-export default GridComponent;
+export default depreciated_GridComponent;
 
 //--------- Cell Configurations For Different Data Types ------------
 const numberEditorComponent = (gridEditFormat, restProps) => {
@@ -1406,7 +1409,7 @@ const addDecimalIfApplicable = (value, handlerFunction) => {
 }
 
 //--------------------- Prop Types ------------------------------
-GridComponent.propTypes = {
+depreciated_GridComponent.propTypes = {
     //-------------------------------------------------------
     //Required
     columns: PropTypes.arrayOf(PropTypes.exact({

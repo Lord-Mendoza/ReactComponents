@@ -3,12 +3,18 @@ import question from "../images/question.png";
 import Select from "react-select";
 import {Col, Container, Row} from "react-bootstrap";
 import React, {useState} from "react";
-import "../styling/FormsFieldComponent.css";
 import PopupComponent from "./PopupComponent";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Moment from 'moment';
 import {isNotAnEmptyObject} from "../utilities/ObjectVariableValidators";
+
+//Styling
+import "../styling/FormsFieldComponent.css";
+import 'semantic-ui-css/semantic.min.css';
+import "react-datepicker/dist/react-datepicker.css";
+import "../styling/SearchFormComponent.css";
+
 
 function FormFieldsComponent(props) {
     let {

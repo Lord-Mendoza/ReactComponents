@@ -9,7 +9,6 @@ import {isANumber} from "../utilities/NumberVariableValidator";
 import {isNotAnEmptyObject} from "../utilities/ObjectVariableValidators";
 import {isNotAnEmptyArray} from "../utilities/ArrayVariableValidators";
 import FormFieldsComponent from "./FormFieldsComponent";
-import "../styling/SearchFormComponent.css";
 import filter from "../images/filter_detail.gif";
 import reset from '../images/reset.png';
 import mainSearch from '../images/mainSearchIcon.gif';
@@ -18,6 +17,12 @@ import {connect} from "react-redux";
 import {isNotEmptyString} from "../utilities/StringVariableValidators";
 import PopupComponent from "./PopupComponent";
 import PropTypes from 'prop-types';
+
+//Styling
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'semantic-ui-css/semantic.min.css';
+import "react-datepicker/dist/react-datepicker.css";
+import "../styling/SearchFormComponent.css";
 
 const ExcelFile = ReactExport.ExcelFile;
 const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
