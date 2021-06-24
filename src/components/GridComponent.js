@@ -10,18 +10,18 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styling/GridComponent.css";
 
 //Validators
-import {isNotEmptyString} from "../../../utilities/helpers/StringVariableValidators";
-import {isNotAnEmptyArray} from "../../../utilities/helpers/ArrayVariableValidators";
+import {isNotEmptyString} from "../utilities/StringVariableValidators";
+import {isNotAnEmptyArray} from "../utilities/ArrayVariableValidators";
 import {
     isNotAnEmptyObject,
     isNotNullNorUndefined,
     isNotSameObject,
     isNullOrUndefined
-} from "../../../utilities/helpers/ObjectVariableValidators";
-import {isANumber} from "../../../utilities/helpers/NumberVariableValidator";
+} from "../utilities/ObjectVariableValidators";
+import {isANumber} from "../utilities/NumberVariableValidator";
 
 //Helpers
-import {compareDates} from "../../../utilities/helpers/CompareDates";
+import {compareDates} from "../utilities/CompareDates";
 
 //Dev-Express
 import {
@@ -69,7 +69,7 @@ import {
 //Additional Packages
 import PopupComponent from "./PopupComponent";
 import {Col, Container, Image, Modal, Row} from "react-bootstrap";
-import warningImg from "../../../images/warning.png";
+import warningImg from "../images/warning.png";
 import {FaCheck, FaTimes} from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
@@ -1036,7 +1036,7 @@ class GridComponent extends React.Component {
                                 showConfirmationPopup: false,
                                 confirmationMessage: ""
                             })}
-                            show={showConfirmationPopup}
+                            show={showConfirmationPopup === true}
                             hasBodyPadding={true}
             />
         </div>)
