@@ -5,6 +5,7 @@ import {Button, Form, Icon, Popup} from "semantic-ui-react";
 
 //Styling
 import "../styling/GridComponent.css";
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 //Validators
 import {isNotEmptyString} from "../utilities/StringVariableValidators";

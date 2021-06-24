@@ -11,7 +11,6 @@ module.exports = {
         rules: [
             {
                 test: /\.js?$/,
-                exclude: /(node_modules)/,
                 use: 'babel-loader',
             },
             {
@@ -35,7 +34,9 @@ module.exports = {
             'react-dom': path.resolve(__dirname, './node_modules/react-dom')
         },
         fallback: {
-            fs: false
+            fs: false,
+            crypto: false,
+            "crypto-browserify": require.resolve('crypto-browserify')
         }
     },
     externals: {
