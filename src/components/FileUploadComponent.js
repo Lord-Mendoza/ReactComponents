@@ -10,7 +10,7 @@ import PropTypes from "prop-types";
 //React-Dropzone
 import {useDropzone} from 'react-dropzone';
 import {Button, Container, Icon, Image} from "semantic-ui-react";
-import upload from "../../../images/upload.png";
+import upload from "../images/upload.png";
 
 //Styling
 import 'semantic-ui-css/semantic.min.css';
