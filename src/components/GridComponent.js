@@ -10,15 +10,18 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../styling/GridComponent.css";
 
 //Validators
-import {isNotEmptyString} from "../utilities/StringVariableValidators";
-import {isNotAnEmptyArray} from "../utilities/ArrayVariableValidators";
+import {isNotEmptyString} from "../../../utilities/helpers/StringVariableValidators";
+import {isNotAnEmptyArray} from "../../../utilities/helpers/ArrayVariableValidators";
 import {
     isNotAnEmptyObject,
     isNotNullNorUndefined,
     isNotSameObject,
     isNullOrUndefined
-} from "../utilities/ObjectVariableValidators";
-import {isANumber} from "../utilities/NumberVariableValidator";
+} from "../../../utilities/helpers/ObjectVariableValidators";
+import {isANumber} from "../../../utilities/helpers/NumberVariableValidator";
+
+//Helpers
+import {compareDates} from "../../../utilities/helpers/CompareDates";
 
 //Dev-Express
 import {
@@ -62,15 +65,16 @@ import {
     SummaryState,
     TreeDataState
 } from "@devexpress/dx-react-grid";
-import {compareDates} from "../utilities/CompareDates";
+
+//Additional Packages
 import PopupComponent from "./PopupComponent";
 import {Col, Container, Image, Modal, Row} from "react-bootstrap";
-import warningImg from "../images/warning.png";
+import warningImg from "../../../images/warning.png";
 import {FaCheck, FaTimes} from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import Select from "react-select";
 
-class depreciated_GridComponent extends React.Component {
+class GridComponent extends React.Component {
     constructor(props) {
         super(props);
 
@@ -172,15 +176,15 @@ class depreciated_GridComponent extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState, nextContext) {
-         if (this.props !== nextProps)
-             return true;
-         else if (isNotSameObject(this.props, nextProps))
-             return true;
-         else if (this.state !== nextState)
-             return true;
-         else if (isNotSameObject(this.state, nextState)) {
-             return true;
-         } else {
+        if (this.props !== nextProps)
+            return true;
+        else if (isNotSameObject(this.props, nextProps))
+            return true;
+        else if (this.state !== nextState)
+            return true;
+        else if (isNotSameObject(this.state, nextState)) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -347,7 +351,7 @@ class depreciated_GridComponent extends React.Component {
 
         //~~~~~~~~~~~~~~~~ Setting Up How Edit Fields Are Displayed By Fields Prop ~~~~~~~~~~~~~~~~~~~~~~~~
         //Filtering editable fields and adding necessary edit cell configuration
-        let integerColumns = [], doubleColumns = [], booleanColumns = [], dropdownColumns = {}, dateEditColumns = {};
+        let textColumns = [], integerColumns = [], doubleColumns = [], booleanColumns = [], dropdownColumns = {}, dateEditColumns = {};
         if (isNotAnEmptyObject(fields)) {
             Object.keys(fields).forEach(field => {
                 if (typeof fields[field]["type"] === "string") {
@@ -366,6 +370,9 @@ class depreciated_GridComponent extends React.Component {
                                 dateEditColumns[field] = {format: field["format"]};
                             else
                                 dateEditColumns[field] = {format: "MM/DD/YYYY"};
+                            break;
+                        case "text":
+                            textColumns.push(field);
                             break;
                         default:
                             break;
@@ -392,6 +399,20 @@ class depreciated_GridComponent extends React.Component {
         }
 
         //------------------------------------------------------
+        //Text Type
+        if (isNotAnEmptyArray(textColumns)) {
+            typeProviders.push(
+                <DataTypeProvider
+                    for={textColumns}
+                    editorComponent={
+                        ({...restProps}) =>
+                            textEditorComponent(gridEditFormat, restProps)
+                    }
+                />
+            )
+        }
+
+        // ------------------------------------------------------
         //Integer Type
         if (isNotAnEmptyArray(integerColumns)) {
             typeProviders.push(
@@ -663,11 +684,11 @@ class depreciated_GridComponent extends React.Component {
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //Initializing Edit State
-            if (allowDeleting && showDeleteConfirmation) {
+            if (allowDeleting) {
                 editingStateProps["onCommitChanges"] = ({added, changed, deleted}) => {
-                    if (isNotAnEmptyArray(deleted))
+                    if (showDeleteConfirmation) {
                         this.setState({showConfirmationPopup: true, onCommitObj: {added, changed, deleted}});
-                    else
+                    } else
                         onCommitChanges({added, changed, deleted});
                 };
             } else {
@@ -749,7 +770,9 @@ class depreciated_GridComponent extends React.Component {
             if (allowDeleting)
                 tableEditColumnProps["showDeleteCommand"] = true;
 
-            if ((isNotAnEmptyArray(rows) && allowEditing && gridEditFormat === "row") || allowCreating) {
+            if ((isNotAnEmptyArray(rows) && allowEditing && gridEditFormat === "row")
+                || (isNotAnEmptyArray(rows) && allowDeleting)
+                || allowCreating) {
                 tableEditColumn = <TableEditColumn {...tableEditColumnProps}/>;
             }
 
@@ -933,13 +956,13 @@ class depreciated_GridComponent extends React.Component {
 
                 {/* ---- Main Table ----*/}
                 <Table tableComponent={
-                            ({...restProps}) => (
-                                <Table.Table
-                                    {...restProps}
-                                    className="table-striped"
-                                />
-                            )
-                        }
+                    ({...restProps}) => (
+                        <Table.Table
+                            {...restProps}
+                            className="table-striped"
+                        />
+                    )
+                }
                        {...tableCellComponent}
                        {...tableColumnExtensions}
                 />
@@ -1013,16 +1036,53 @@ class depreciated_GridComponent extends React.Component {
                                 showConfirmationPopup: false,
                                 confirmationMessage: ""
                             })}
-                            show={showConfirmationPopup === true}
+                            show={showConfirmationPopup}
                             hasBodyPadding={true}
             />
         </div>)
     }
 }
 
-export default depreciated_GridComponent;
+export default GridComponent;
 
 //--------- Cell Configurations For Different Data Types ------------
+const textEditorComponent = (gridEditFormat, restProps) => {
+    let content = (value, onChangeCallback, restProps) => {
+        let placeholder = restProps["column"]["title"] ? restProps["column"]["title"] : "";
+
+        let onSubmit;
+        if (restProps["onSubmit"]) {
+            onSubmit = () => {
+                onChangeCallback(value);
+                restProps["onSubmit"]();
+            };
+        }
+
+        return <Form onSubmit={onSubmit} style={{fontSize: "12px"}}>
+            <Form.Input
+                placeholder={placeholder}
+                type={"text"}
+                autoFocus
+                fluid={true}
+                onChange={
+                    (e, {value}) => {
+                        onChangeCallback(value);
+                    }
+                }
+                value={value}
+                className="gridInputField"
+            />
+        </Form>
+    };
+
+    if (gridEditFormat === "row") {
+        const {value, onValueChange} = restProps;
+        return content(value, onValueChange, restProps);
+    } else {
+        return getWrappedEditorComponent(content, restProps);
+    }
+}
+
 const numberEditorComponent = (gridEditFormat, restProps) => {
     let content = (value, onChangeCallback, restProps) => {
         const {column} = restProps;
@@ -1408,7 +1468,7 @@ const addDecimalIfApplicable = (value, handlerFunction) => {
 }
 
 //--------------------- Prop Types ------------------------------
-depreciated_GridComponent.propTypes = {
+GridComponent.propTypes = {
     //-------------------------------------------------------
     //Required
     columns: PropTypes.arrayOf(PropTypes.exact({
