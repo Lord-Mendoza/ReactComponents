@@ -12,3 +12,12 @@
         transform: rotate(360deg);
     }
 }
+
+img.loadingIcon {
+    height: 75px;
+    margin: -5px 5px -3px 0;
+}
+
+.maskComponentBackdrop {
+    z-index: 1050;
+}

@@ -7,8 +7,7 @@ Lord Mendoza - 4/23/19
 //React
 import React from 'react';
 import PropTypes from "prop-types";
-import loading from '../images/upload.png';
-
+import loading from '../images/loading.png';
 //React-Bootstrap
 import {Col, Container, Image, Modal, Row} from "react-bootstrap";
 

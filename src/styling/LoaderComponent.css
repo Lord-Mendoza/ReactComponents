@@ -1,0 +1,7 @@
+.ui.fluid.card.loaderCard {
+    box-shadow: none !important;
+}
+
+.ui.fluid.card.loaderCard .ui.active.transition.visible.inverted.dimmer {
+    z-index: 1000;
+}

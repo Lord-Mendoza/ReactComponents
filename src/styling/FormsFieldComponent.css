@@ -23,31 +23,55 @@
     padding-left: 9px;
 }
 
+.formFieldsCol .ui.input,
+.formFieldsCol .react-datepicker-wrapper,
+.formFieldsCol button.ui.mini.compact.fluid.button,
+.formFieldsCol .field.formFieldsTextArea textarea {
+    float: right;
+    margin-right: 3px;
+    width: 174px !important;
+}
+
 .formFieldsCol.col-6 .inline.equal.width.fields.formFields .ui.input,
 .formFieldsCol.col-6 .react-datepicker-wrapper,
-.formFieldsCol.col-6 button.ui.mini.compact.fluid.button {
-    float: right;
+.formFieldsCol.col-6 button.ui.mini.compact.fluid.button,
+.formFieldsCol.col-6 .field.formFieldsTextArea textarea {
     width: 174px !important;
-    height: 30px;
-    margin-right: 3px;
 }
 
 .formFieldsCol.col-4 .inline.equal.width.fields.formFields .ui.input,
 .formFieldsCol.col-4 .react-datepicker-wrapper,
-.formFieldsCol.col-4 button.ui.mini.compact.fluid.button {
-    float: right;
+.formFieldsCol.col-4 button.ui.mini.compact.fluid.button,
+.formFieldsCol.col-4 .field.formFieldsTextArea textarea {
     width: 160px !important;
-    height: 30px;
-    margin-right: 3px;
 }
 
 .formFieldsCol.col-3 .inline.equal.width.fields.formFields .ui.input,
 .formFieldsCol.col-3 .react-datepicker-wrapper,
-.formFieldsCol.col-3 button.ui.mini.compact.fluid.button {
-    float: right;
+.formFieldsCol.col-3 button.ui.mini.compact.fluid.button,
+.formFieldsCol.col-3 .field.formFieldsTextArea textarea {
     width: 146px !important;
+}
+
+.formFieldsCol.col-6 .ui.action.input input {
+    width: 135px !important;
+}
+
+.formFieldsCol.col-4 .ui.action.input input {
+    width: 120px !important;
+}
+
+.formFieldsCol.col-3 .ui.action.input input {
+    width: 108px !important;
+}
+
+.ui.input, .react-datepicker-wrapper, button.ui.mini.compact.fluid.button {
     height: 30px;
-    margin-right: 3px;
+}
+
+.field.formFieldsTextArea {
+    margin-top: 5px !important;
+    height: inherit;
 }
 
 .formFieldsCol.col-3 .inline.equal.width.fields.formFields input[type="date"] {
@@ -66,4 +90,13 @@ div.ui.selection.dropdown{
 
 .react-datepicker {
     z-index: 1000;
+}
+
+.lookupPopup .modal-header {
+    border-bottom: 0;
+}
+
+.lookupPopup .modal-body {
+    padding: 0;
+    margin: 0;
 }

@@ -10,6 +10,8 @@ import PropTypes from "prop-types";
 //React-Dropzone
 import {useDropzone} from 'react-dropzone';
 import {Button, Container, Icon, Image} from "semantic-ui-react";
+import upload from "../../../images/upload.png";
+
 //Styling
 import 'semantic-ui-css/semantic.min.css';
 import '../styling/FileUploadComponent.css';
@@ -24,7 +26,12 @@ function FileUpload(props) {
         // eslint-disable-next-line
     }, []);
 
-    const {getRootProps, getInputProps} = useDropzone({onDrop, accept: props.fileType});
+    const {getRootProps, getInputProps} = useDropzone({
+        onDrop,
+        accept: props.fileType,
+        maxFiles: props.allowMultiUpload === false ? 1 : 0,
+        multiple: props.allowMultiUpload === true
+    });
 
     if (props.uploadByBtn)
         return (<div {...getRootProps({className: 'ui tiny icon right labeled button'})}>
@@ -38,7 +45,7 @@ function FileUpload(props) {
             <section className="container">
                 <div {...getRootProps({className: 'dropzone'})}>
                     <input {...getInputProps()} />
-                    <Image src={"./upload.png"}/>
+                    <Image src={upload}/>
                     <h4>{props.fileUploadText}</h4>
                 </div>
             </section>
@@ -81,6 +88,10 @@ class FileUploadComponent extends Component {
             if (typeof this.props.showFileUploadManager === "boolean")
                 showFileUploadManager = this.props.showFileUploadManager;
 
+        let allowMultiUpload = true;
+        if (this.props.allowMultiUpload === false)
+            allowMultiUpload = this.props.allowMultiUpload;
+
         //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
             files: [],
@@ -88,7 +99,8 @@ class FileUploadComponent extends Component {
             resetUponSubmit,
             fileUploadText,
             uploadByBtn,
-            showFileUploadManager
+            showFileUploadManager,
+            allowMultiUpload
         };
 
         //------The functions for this class------
@@ -147,7 +159,7 @@ class FileUploadComponent extends Component {
     //=========================================== RENDER ===============================================================
 
     render() {
-        const {files, fileType, fileUploadText, uploadByBtn, showFileUploadManager} = this.state;
+        const {files, fileType, fileUploadText, uploadByBtn, showFileUploadManager, allowMultiUpload} = this.state;
 
         /*
         Displaying the list of files that the user uploaded underneath the file drop component. It will display a trash
@@ -190,7 +202,8 @@ class FileUploadComponent extends Component {
                     <FileUpload listOfFiles={this.getListOfFiles}
                                 fileType={fileType}
                                 fileUploadText={fileUploadText}
-                                uploadByBtn={uploadByBtn}/>
+                                uploadByBtn={uploadByBtn}
+                                allowMultiUpload={allowMultiUpload}/>
                     {filesToBeUploaded}
                 </div>
             );
@@ -201,7 +214,8 @@ class FileUploadComponent extends Component {
                         <FileUpload listOfFiles={this.getListOfFiles}
                                     fileType={fileType}
                                     fileUploadText={fileUploadText}
-                                    uploadByBtn={uploadByBtn}/>
+                                    uploadByBtn={uploadByBtn}
+                                    allowMultiUpload={allowMultiUpload}/>
                         {filesToBeUploaded}
                     </Container>
                 </div>
@@ -246,17 +260,17 @@ FileUploadComponent.propTypes = {
         if (props[propName] !== undefined)
             if (typeof props[propName] !== 'boolean')
                 return new Error('resetUponSubmit requires a boolean as value.');
-            if (props["showFileUploadManager"] !== undefined)
-                if (props["showFileUploadManager"] === false)
-                    return new Error('resetUponSubmit only applies when showFileUploadManager is set to true.');
+        if (props["showFileUploadManager"] !== undefined)
+            if (props["showFileUploadManager"] === false)
+                return new Error('resetUponSubmit only applies when showFileUploadManager is set to true.');
     },
 
     /**
      <b>Description:</b> The label of the upload field/button.
      <b>Value:</b> A string
      <b>Default:</b>
-        -If uploadByBtn is set to true, the default fileUploadText is "Upload"
-        -Otherwise, it's "Drag and drop some files here, or click to select files"
+     -If uploadByBtn is set to true, the default fileUploadText is "Upload"
+     -Otherwise, it's "Drag and drop some files here, or click to select files"
      */
     fileUploadText: function (props, propName) {
         if (props[propName] !== undefined)
@@ -281,10 +295,12 @@ FileUploadComponent.propTypes = {
      <b>Default:</b> true
      */
     showFileUploadManager: function (props, propName) {
-    if (props[propName] !== undefined)
-        if (typeof props[propName] !== 'boolean')
-            return new Error('showFileUploadManager requires a boolean as value.')
-    }
+        if (props[propName] !== undefined)
+            if (typeof props[propName] !== 'boolean')
+                return new Error('showFileUploadManager requires a boolean as value.')
+    },
+
+    allowMultiUpload: PropTypes.bool,
 };
 
 export default FileUploadComponent;

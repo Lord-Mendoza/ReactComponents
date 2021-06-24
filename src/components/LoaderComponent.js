@@ -10,7 +10,10 @@ import PropTypes from "prop-types";
 
 //Semantic-UI React
 import {Card, Dimmer, Loader} from 'semantic-ui-react';
+
+//Styling
 import 'semantic-ui-css/semantic.min.css';
+import "../styling/LoaderComponent.css";
 
 //======================================================================================================================
 //=========================================== START OF CLASS ===========================================================
@@ -18,6 +21,8 @@ import 'semantic-ui-css/semantic.min.css';
 class LoaderComponent extends Component {
     constructor(props) {
         super(props);
+
+        const {isLoading, content} = props;
 
         let inverted = true;
         if (this.props.inverted !== undefined)
@@ -30,8 +35,8 @@ class LoaderComponent extends Component {
 
         //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
-            content: "",
-            isLoading: true,
+            content,
+            isLoading,
             inverted,
             loadingMessage
         };
@@ -40,19 +45,13 @@ class LoaderComponent extends Component {
     //==================================================================================================================
     //================================== REACT STATE COMPONENTS ========================================================
 
-    componentDidMount() {
-        const {content, isLoading} = this.props;
-
-        if (content !== undefined && isLoading !== undefined) {
-            this.setState({content, isLoading});
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.content !== prevProps.content) {
+            this.setState({content: this.props["content"]});
         }
-    }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.content !== prevProps.content || this.props.isLoading !== prevProps.isLoading) {
-            const {content, isLoading} = this.props;
-            this.setState({content, isLoading});
-        }
+        if (this.props.isLoading !== prevProps.isLoading)
+            this.setState({isLoading: this.props["isLoading"]})
     }
 
     //=========================================== RENDER ===============================================================
@@ -73,7 +72,7 @@ class LoaderComponent extends Component {
         //Rendering the loader
         return (
             <div>
-                <Card fluid={true}>
+                <Card fluid={true} className={"loaderCard"}>
                     {loader}
                     {content}
                 </Card>

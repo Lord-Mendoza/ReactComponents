@@ -29,14 +29,17 @@ class PopupComponent extends React.PureComponent {
         if (props.hasOwnProperty("className"))
             className = props["className"];
 
+        let show = true;
+        if (props.hasOwnProperty("show"))
+            show = props["show"];
+
         let allowAnimation = !isIE;
 
         //-------------------------------------- STATE VALUES ----------------------------------------------------------
         this.state = {
-            header: "",
-            content: "",
-            footerConfig: "",
-            show: true,
+            ...props,
+
+            show,
             className,
             allowAnimation
         };
@@ -62,35 +65,24 @@ class PopupComponent extends React.PureComponent {
     //================================== REACT STATE COMPONENTS ========================================================
 
     /*
-    This initializes the modal & ensures that if the "custom" footer config is set, then the corresponding
-    customFooter props is also defined.
-     */
-    componentDidMount() {
-        const {header, content, footerConfig, customFooter} = this.props;
-
-        if (header !== undefined && content !== undefined && footerConfig !== undefined) {
-            if (this.state.footerConfig === "custom" && this.state.customFooter !== undefined)
-                this.setState({
-                    header, content, footerConfig, customFooter
-                });
-            else if (this.state.footerConfig !== "custom")
-                this.setState({
-                    header, content, footerConfig
-                });
-        }
-    }
-
-    /*
     If any changes occur in the body of the modal, then the modal gets rendered accordingly.
      */
     componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.hasOwnProperty("show") && prevProps["show"] !== this.props["show"]) {
+            this.setState({show: this.props["show"]})
+        }
+
+        if (this.props.header !== prevProps.header){
+            const {header} = this.props;
+            this.setState({header});
+        }
+
         if (this.props.content !== prevProps.content){
             const {content} = this.props;
             this.setState({content});
         }
 
-        if (this.props.hasOwnProperty("className") && prevProps.hasOwnProperty("className")
-            && prevProps["className"] !== this.props["className"]) {
+        if (this.props.hasOwnProperty("className") && prevProps["className"] !== this.props["className"]) {
             this.setState({className: this.props["className"]});
         }
     }
@@ -99,6 +91,7 @@ class PopupComponent extends React.PureComponent {
 
     render() {
         const {header, content, footerConfig, show, className, allowAnimation} = this.state;
+        const {hasBodyPadding} = this.props;
 
         //Based on the selected footerConfig, then certain buttons will get rendered in the footer of the modal.
         let btnOptions;
@@ -138,6 +131,11 @@ class PopupComponent extends React.PureComponent {
             btnOptions = this.props.customFooter;
         }
 
+        let modalBodyStyle = {};
+        if (!hasBodyPadding) {
+            modalBodyStyle["padding"] = "0";
+        }
+
         //Rendering the modal
         return (
             <div>
@@ -147,7 +145,7 @@ class PopupComponent extends React.PureComponent {
                         <Modal.Title> <b> {header} </b> </Modal.Title>
                     </Modal.Header>
 
-                    <Modal.Body>
+                    <Modal.Body style={{...modalBodyStyle}}>
                         {content}
                     </Modal.Body>
 
@@ -173,6 +171,8 @@ PopupComponent.propTypes = {
      */
     content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
 
+    show: PropTypes.bool,
+
     /**
      <b>Description:</b> The buttons to appear at the foot of the popup.
      <i>Note: providing the value of "custom" requires for customFooter to be defined.</i>
@@ -182,7 +182,7 @@ PopupComponent.propTypes = {
      iii. "submit" = renders a close button as well as submit button.
      iv. "all" = renders a close, reset, & submit button. Ideal for forms.
      */
-    footerConfig: PropTypes.string.isRequired,
+    footerConfig: PropTypes.string,
 
     closeToggled: PropTypes.func.isRequired,
 
@@ -239,6 +239,7 @@ PopupComponent.propTypes = {
     },
 
     className: PropTypes.string,
+    hasBodyPadding: PropTypes.bool,
 };
 
 export default PopupComponent;
