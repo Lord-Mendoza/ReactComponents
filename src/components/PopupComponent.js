@@ -30,8 +30,8 @@ class PopupComponent extends React.PureComponent {
             className = props["className"];
 
         let show = true;
-        if (props.hasOwnProperty("show"))
-            show = props["show"];
+        if (props.hasOwnProperty("show") && props["show"] === false)
+            show = false;
 
         let allowAnimation = !isIE;
 

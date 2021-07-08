@@ -102,7 +102,7 @@ class GridComponent extends React.Component {
             columnOrder: isNotAnEmptyArray(columns) ? columns.map(v => {
                 return v["name"]
             }) : [],
-            columnWidths: isNotAnEmptyObject(columnWidths) ? this.getColumnWidths(columnWidths) : [],
+            columnWidths: isNotAnEmptyObject(columnWidths) ? this.getColumnWidths(columnWidths) : this.getColumnWidths([]),
             groupKeyArray,
 
             onCommitObj: {},
@@ -129,14 +129,6 @@ class GridComponent extends React.Component {
         }
     }
 
-    componentDidMount() {
-        // Sets the placeholder from "Searching..." to "Filtering..." for better accuracy
-        // Only works the first time
-        // if (isNotNullNorUndefined(document.querySelector('.w-25'))) {
-        //     document.querySelector('.w-25').setAttribute('placeholder', 'Filtering...');
-        // }
-    }
-
     componentDidUpdate(prevProps, prevState, snapshot) {
         const {
             rows, columns,
@@ -154,7 +146,7 @@ class GridComponent extends React.Component {
 
         if (prevProps["columnWidths"] !== columnWidths) {
             this.setState({
-                columnWidths: isNotAnEmptyObject(columnWidths) ? this.getColumnWidths(columnWidths) : []
+                columnWidths: isNotAnEmptyObject(columnWidths) ? this.getColumnWidths(columnWidths) : this.getColumnWidths([])
             })
         }
 
@@ -177,17 +169,12 @@ class GridComponent extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState, nextContext) {
-        if (this.props !== nextProps)
+        if (this.props !== nextProps && isNotSameObject(this.props, nextProps))
             return true;
-        else if (isNotSameObject(this.props, nextProps))
+        else if (this.state !== nextState && isNotSameObject(this.state, nextState))
             return true;
-        else if (this.state !== nextState)
-            return true;
-        else if (isNotSameObject(this.state, nextState)) {
-            return true;
-        } else {
+        else
             return false;
-        }
     }
 
     getColumnWidths(columnWidths) {
@@ -229,7 +216,7 @@ class GridComponent extends React.Component {
             tableCellConfig,
 
             //Filtering
-            allowFiltering,
+            allowFiltering, filterPlaceholder,
 
             //Grouping
             allowGrouping, grouping, expandGroupsByDefault, hideColumnNameInGrouping, showGroupCount,
@@ -238,7 +225,7 @@ class GridComponent extends React.Component {
             allowSummarizing, summaryItems, summaryItemLabels, customSummaries,
 
             //Selecting
-            allowSelections, selections, changeSelections, showSelectAll, selectByRowClick,
+            allowSelections, selections, changeSelections, showSelectAll, selectByRowClick, selectByGroup,
 
             //Data Modifications
             allowCreating, allowEditing, allowDeleting, editConfig,
@@ -276,7 +263,7 @@ class GridComponent extends React.Component {
 
         //~~~~~~~~~~~~~~~~~~~ Setting Up How Data Is Displayed By Column Type ~~~~~~~~~~~~~~~~~~~~~~~~
         //Filtering currency, number, and date columns for right-alignments, and adding $ ("currency")
-        let numberColumns = [], currencyColumns = [], dateColumns = {};
+        let numberColumns = [], currencyColumns = [], dateColumns = {}, booleanColumns = {};
         if (isNotAnEmptyArray(columns)) {
             columns.forEach(column => {
                 switch (column["type"]) {
@@ -291,6 +278,12 @@ class GridComponent extends React.Component {
                             dateColumns[column.name] = {format: column["format"]};
                         else
                             dateColumns[column.name] = {format: "MM/DD/YYYY"};
+                        break;
+                    case "boolean":
+                        if (isNotAnEmptyObject(column["customTrueFalseValues"]))
+                            booleanColumns[column.name] = {trueFalseValues: column["customTrueFalseValues"]};
+                        else
+                            booleanColumns[column.name] = {trueFalseValues: {true: true, false: false}};
                         break;
                     default:
                         break;
@@ -340,8 +333,30 @@ class GridComponent extends React.Component {
                     for={Object.keys(dateColumns)}
                     formatterComponent={
                         ({column, value}) => {
-                            if (Moment(value).isValid())
+                            if (isNotNullNorUndefined(value) && Moment(value).isValid())
                                 return Moment(value).format(dateColumns[column.name]["format"]);
+                            return "";
+                        }
+                    }
+                />
+            )
+        }
+
+        //------------------------------------------------------
+        //Boolean Type
+        if (isNotAnEmptyObject(booleanColumns)) {
+            typeProviders.push(
+                <DataTypeProvider
+                    for={Object.keys(booleanColumns)}
+                    formatterComponent={
+                        ({column, value}) => {
+                            let trueValue = booleanColumns[column.name]["trueFalseValues"]["true"];
+                            let falseValue = booleanColumns[column.name]["trueFalseValues"]["false"];
+
+                            if (value === trueValue)
+                                return "Y";
+                            else if (value === falseValue)
+                                return "N";
                             else
                                 return "";
                         }
@@ -352,23 +367,26 @@ class GridComponent extends React.Component {
 
         //~~~~~~~~~~~~~~~~ Setting Up How Edit Fields Are Displayed By Fields Prop ~~~~~~~~~~~~~~~~~~~~~~~~
         //Filtering editable fields and adding necessary edit cell configuration
-        let textColumns = [], integerColumns = [], doubleColumns = [], booleanColumns = [], dropdownColumns = {}, dateEditColumns = {};
+        let textColumns = [], editNumberColumns = [], editCurrencyColumns = [], editBooleanColumns = {}, dropdownColumns = {}, dateEditColumns = {};
         if (isNotAnEmptyObject(fields)) {
             Object.keys(fields).forEach(field => {
                 if (typeof fields[field]["type"] === "string") {
                     switch (fields[field]["type"]) {
-                        case "integer":
-                            integerColumns.push(field);
+                        case "number":
+                            editNumberColumns.push(field);
                             break;
-                        case "double":
-                            doubleColumns.push(field);
+                        case "currency":
+                            editCurrencyColumns.push(field);
                             break;
                         case "boolean":
-                            booleanColumns.push(field);
+                            if (isNotAnEmptyObject(fields[field]["customTrueFalseValues"]))
+                                editBooleanColumns[field] = {trueFalseValues: fields[field]["customTrueFalseValues"]};
+                            else
+                                editBooleanColumns[field] = {trueFalseValues: {true: true, false: false}};
                             break;
                         case "date":
-                            if (isNotEmptyString(field["format"]))
-                                dateEditColumns[field] = {format: field["format"]};
+                            if (isNotEmptyString(fields[field]["format"]))
+                                dateEditColumns[field] = {format: fields[field]["format"]};
                             else
                                 dateEditColumns[field] = {format: "MM/DD/YYYY"};
                             break;
@@ -414,11 +432,11 @@ class GridComponent extends React.Component {
         }
 
         // ------------------------------------------------------
-        //Integer Type
-        if (isNotAnEmptyArray(integerColumns)) {
+        //Number Type
+        if (isNotAnEmptyArray(editNumberColumns)) {
             typeProviders.push(
                 <DataTypeProvider
-                    for={integerColumns}
+                    for={editNumberColumns}
                     editorComponent={
                         ({...restProps}) =>
                             numberEditorComponent(gridEditFormat, restProps)
@@ -428,14 +446,14 @@ class GridComponent extends React.Component {
         }
 
         //------------------------------------------------------
-        //Double Type
-        if (isNotAnEmptyArray(doubleColumns)) {
+        //Currency Type
+        if (isNotAnEmptyArray(editCurrencyColumns)) {
             typeProviders.push(
                 <DataTypeProvider
-                    for={doubleColumns}
+                    for={editCurrencyColumns}
                     editorComponent={
                         ({...restProps}) =>
-                            doubleEditorComponent(gridEditFormat, restProps)
+                            currencyEditorComponent(gridEditFormat, restProps)
                     }
                 />
             )
@@ -448,9 +466,8 @@ class GridComponent extends React.Component {
                 <DataTypeProvider
                     for={Object.keys(dateEditColumns)}
                     editorComponent={
-                        //Editor for the currency type is same as double
                         ({...restProps}) =>
-                            dateEditorComponent(gridEditFormat, restProps)
+                            dateEditorComponent(gridEditFormat, {...restProps, dateEditColumns})
                     }
                 />
             )
@@ -458,12 +475,12 @@ class GridComponent extends React.Component {
 
         //------------------------------------------------------
         //Boolean Type
-        if (isNotAnEmptyArray(booleanColumns)) {
+        if (isNotAnEmptyObject(editBooleanColumns)) {
             typeProviders.push(
                 <DataTypeProvider
-                    for={booleanColumns}
+                    for={Object.keys(editBooleanColumns)}
                     editorComponent={({...restProps}) =>
-                        booleanEditorComponent(gridEditFormat, {...restProps, editFieldsHeight})}
+                        booleanEditorComponent(gridEditFormat, {...restProps, editFieldsHeight, editBooleanColumns})}
                 />
             )
         }
@@ -482,8 +499,8 @@ class GridComponent extends React.Component {
             )
         }
 
-        let editableColumns = integerColumns.concat(doubleColumns, booleanColumns, Object.keys(dropdownColumns), Object.keys(dateEditColumns));
-        if (isNotAnEmptyArray(columns)) {
+        let editableColumns = editNumberColumns.concat(editCurrencyColumns, Object.keys(editBooleanColumns), Object.keys(dropdownColumns), Object.keys(dateEditColumns));
+        if (isNotAnEmptyArray(columns) && isNotAnEmptyObject(fields)) {
             let nonEditableFields = [];
             columns.forEach(column => {
                 if (!editableColumns.includes(column.name)) {
@@ -537,40 +554,40 @@ class GridComponent extends React.Component {
         //-------------------------------------------------------
         //Table Cell Configurations
         let tableCellComponent = {};
-        if (isNotNullNorUndefined(tableCellConfig)) {
-            tableCellComponent["cellComponent"] = ({row, column, ...restProps}) => {
-                if (Object.keys(tableCellConfig).includes(column.name)) {
-                    const {onClick, style, renderedComponent} = tableCellConfig[column.name];
+        tableCellComponent["cellComponent"] = ({row, column, ...restProps}) => {
+            if (isNotAnEmptyObject(tableCellConfig) && Object.keys(tableCellConfig).includes(column.name)) {
+                const {onClick, style, renderedComponent} = tableCellConfig[column.name];
 
-                    let tableCellProps = {};
-                    if (typeof onClick === "function")
-                        tableCellProps["onClick"] = () => onClick(row, column);
-                    if (isNotAnEmptyObject(style))
-                        tableCellProps["style"] = style;
+                let tableCellProps = {};
+                if (typeof onClick === "function")
+                    tableCellProps["onClick"] = () => onClick(row, column);
+                if (isNotAnEmptyObject(style))
+                    tableCellProps["style"] = style;
 
-                    if (isNotNullNorUndefined(renderedComponent)) {
-                        return <Table.Cell
-                            {...restProps}
-                            {...tableCellProps}
-                        >
-                            {renderedComponent(row, column)}
-                        </Table.Cell>;
-                    } else {
-                        return <Table.Cell
-                            {...restProps}
-                            {...tableCellProps}
-                        />;
-                    }
-                } else if (allowEditing && editFormat === "cell" && editableColumns.includes(column.name)) {
+                if (isNotNullNorUndefined(renderedComponent)) {
                     return <Table.Cell
                         {...restProps}
-                        style={{
-                            border: "1px solid #a3bae9"
-                        }}
-                    />;
+                        {...tableCellProps}
+                    >
+                        {renderedComponent(row, column)}
+                    </Table.Cell>;
                 } else {
-                    return <Table.Cell {...restProps}/>;
+                    return <Table.Cell
+                        {...restProps}
+                        {...tableCellProps}
+                    />;
                 }
+            } else if (allowEditing && editFormat === "cell" && editableColumns.includes(column.name)
+                && (!isTreeData || (isTreeData && isNotNullNorUndefined(row[column.name]) && !row[column.name].hasOwnProperty("children")))
+            ) {
+                return <Table.Cell
+                    {...restProps}
+                    style={{
+                        border: "1px solid #a3bae9"
+                    }}
+                />;
+            } else {
+                return <Table.Cell {...restProps}/>;
             }
         }
 
@@ -579,7 +596,12 @@ class GridComponent extends React.Component {
         let searchState, integratedFiltering, searchPanel;
         if (allowFiltering) {
             searchState = <SearchState/>;
-            searchPanel = <SearchPanel/>;
+
+            let searchPanelProps = {messages: {searchPlaceholder: "Filter..."}};
+            if (isNotEmptyString(filterPlaceholder))
+                searchPanelProps["messages"] = {searchPlaceholder: filterPlaceholder};
+
+            searchPanel = <SearchPanel {...searchPanelProps}/>;
 
             //The props below prevents any hidden columns from being searched. Can be made configurable
             // later if found to be needed.
@@ -649,7 +671,7 @@ class GridComponent extends React.Component {
         }
 
         //-------------------------------------------------------
-        // Grouping & Summarizing can use similar hooks, so here it is accommodated for both cases
+        // Grouping & Summarizing
         let summaryState;
         if ((allowGrouping && grouping && showGroupCount) || (allowSummarizing && isNotAnEmptyArray(summaryItems))) {
             summaryState = <SummaryState {...summaryStateProps}/>;
@@ -661,21 +683,55 @@ class GridComponent extends React.Component {
         }
 
         //-------------------------------------------------------
-        //Summarizing
-        let selectionState, tableSelection, integratedSelection;
-        if (allowSelections && isNotAnEmptyArray(rows)) {
-            selectionState = <SelectionState selection={isNotAnEmptyArray(selections) ? selections : []}
-                                             onSelectionChange={changeSelections}/>;
+        //Selecting
+        let selectionState, tableSelection, integratedSelection, tableSelectionProps = {};
+        if (allowSelections) {
+            //Accommodating for group selections
+            if (allowGrouping && grouping && selectByGroup) {
+                selectionState = <SelectionState selection={isNotAnEmptyArray(selections) ? selections : []}
+                                                 onSelectionChange={(newSelections) => {
+                                                     //If the user de-selects a row, it will automatically de-select
+                                                     // the rest of the rows for that group.
+                                                     if (selectByGroup && newSelections.length < selections.length) {
+                                                         let removedSelection = selections.filter(v => !newSelections.includes(v));
+                                                         let revisedSelections = [];
+                                                         for (let i = 0; i < selections.length; i++) {
+                                                             let currentSelection = selections[i];
 
-            let tableSelectionProps = {};
-            if (selectByRowClick)
-                tableSelectionProps["selectByRowClick"] = true;
-            if (showSelectAll) {
-                tableSelectionProps["showSelectAll"] = true;
-                integratedSelection = <IntegratedSelection/>;
+                                                             if (rows[currentSelection][grouping] !== rows[removedSelection][grouping])
+                                                                 revisedSelections.push(currentSelection);
+                                                         }
+
+                                                         changeSelections(revisedSelections);
+                                                     } else {
+                                                         //If the user selects a row, it will automatically selects
+                                                         // the rest of the rows for that group.
+                                                         let revisedSelections = [];
+                                                         for (let i = 0; i < rows.length; i++) {
+                                                             let row = rows[i];
+
+                                                             if (row[grouping] === rows[newSelections[0]][grouping])
+                                                                 revisedSelections.push(i);
+                                                         }
+
+                                                         changeSelections(revisedSelections);
+                                                     }
+                                                 }}
+                />;
+            } else if (isNotAnEmptyArray(rows)) {
+                selectionState = <SelectionState selection={isNotAnEmptyArray(selections) ? selections : []}
+                                                 onSelectionChange={changeSelections}/>;
+
+                if (selectByRowClick)
+                    tableSelectionProps["selectByRowClick"] = true;
+                if (showSelectAll) {
+                    tableSelectionProps["showSelectAll"] = true;
+                    integratedSelection = <IntegratedSelection/>;
+                }
             }
 
-            tableSelection = <TableSelection {...tableSelectionProps}/>;
+            if ( (allowGrouping && grouping && selectByGroup) || isNotAnEmptyArray(rows))
+                tableSelection = <TableSelection {...tableSelectionProps}/>;
         }
 
         //-------------------------------------------------------
@@ -722,30 +778,26 @@ class GridComponent extends React.Component {
                         let changeObject = changed[targetIndex];
 
                         if (isNotAnEmptyObject(changeObject)) {
-                            if (isTreeData) {
-                                let parentIndex = 0;
-                                let childIndex = 0;
-                                let parentChildCount = 0;
+                            let parentIndex = 0;
+                            let childIndex = 0;
+                            let parentChildCount = 0;
 
-                                for (parentIndex; parentIndex < rows.length; parentIndex++) {
-                                    let currentParent = rows[parentIndex];
-                                    if (currentParent.hasOwnProperty("children")) {
-                                        if (parentChildCount + 1 + currentParent["children"].length >= targetIndex) {
-                                            parentChildCount++;
-                                            childIndex = targetIndex - parentChildCount;
-                                            break;
-                                        } else {
-                                            parentChildCount += currentParent["children"].length + 1;
-                                        }
-                                    } else {
+                            for (parentIndex; parentIndex < rows.length; parentIndex++) {
+                                let currentParent = rows[parentIndex];
+                                if (currentParent.hasOwnProperty("children")) {
+                                    if (parentChildCount + 1 + currentParent["children"].length >= targetIndex) {
                                         parentChildCount++;
+                                        childIndex = targetIndex - parentChildCount;
+                                        break;
+                                    } else {
+                                        parentChildCount += currentParent["children"].length + 1;
                                     }
+                                } else {
+                                    parentChildCount++;
                                 }
-
-                                onCommitChanges({targetIndex: [parentIndex, childIndex], changeObject})
-                            } else {
-                                onCommitChanges({targetIndex, changeObject})
                             }
+
+                            onCommitChanges({targetIndex: [parentIndex, childIndex], changed: changeObject})
                         }
                     };
                 } else
@@ -980,9 +1032,9 @@ class GridComponent extends React.Component {
                 {tableEditColumn}
                 {tableRowDetail}
 
+                {tableSelection}
                 {tableGroupRow}
                 {tableSummaryRow}
-                {tableSelection}
                 {toolbar}
 
                 {/* ---- Panels ---- */}
@@ -1037,7 +1089,7 @@ class GridComponent extends React.Component {
                                 showConfirmationPopup: false,
                                 confirmationMessage: ""
                             })}
-                            show={showConfirmationPopup === true}
+                            show={showConfirmationPopup}
                             hasBodyPadding={true}
             />
         </div>)
@@ -1137,7 +1189,7 @@ const numberEditorComponent = (gridEditFormat, restProps) => {
     }
 }
 
-const doubleEditorComponent = (gridEditFormat, restProps) => {
+const currencyEditorComponent = (gridEditFormat, restProps) => {
     let content = (value, onValueChange, restProps) => {
         const {column} = restProps;
         let origValue = restProps["row"][column.name];
@@ -1188,17 +1240,20 @@ const doubleEditorComponent = (gridEditFormat, restProps) => {
 };
 
 const dateEditorComponent = (gridEditFormat, restProps) => {
-    let content = (value, onValueChange) => {
+    let content = (value, onValueChange, restProps) => {
+        const {column, dateEditColumns} = restProps;
+        const {format} = dateEditColumns[column.name];
+
         return (<div className={"gridDatePicker"}>
             <DatePicker
                 selected={
-                    value ? new Date(Moment(value).format("MM/DD/YYYY")) : undefined
+                    value ? new Date(Moment(value).format(format)) : undefined
                 }
                 onChange={date => {
-                    onValueChange(Moment(date).isValid() ? new Date(Moment(date).format("MM/DD/YYYY")) : undefined);
+                    onValueChange(Moment(date).isValid() ? new Date(Moment(date).format(format)) : undefined);
                 }}
-                dateFormat={"MM/dd/yyyy"}
-                placeholderText="mm/dd/yyyy"
+                dateFormat={format.replace("YYYY", "yyyy").replace("DD", "dd")}
+                placeholderText={format}
                 isClearable
                 showMonthDropdown
                 showYearDropdown
@@ -1211,7 +1266,7 @@ const dateEditorComponent = (gridEditFormat, restProps) => {
 
     if (gridEditFormat === "row") {
         const {value, onValueChange} = restProps;
-        return content(value, onValueChange);
+        return content(value, onValueChange, restProps);
     } else {
         return getWrappedEditorComponent(content, restProps);
     }
@@ -1219,75 +1274,25 @@ const dateEditorComponent = (gridEditFormat, restProps) => {
 
 const booleanEditorComponent = (gridEditFormat, restProps) => {
     let content = (value, onValueChange, restProps) => {
-        const {column, editFieldsHeight, booleanOptions} = restProps;
+        const {column, editBooleanColumns} = restProps;
+        const {trueFalseValues} = editBooleanColumns[column.name];
 
-        let dropdownOptions;
-        if (isNotAnEmptyArray(booleanOptions)) {
-            dropdownOptions = booleanOptions;
-        } else {
-            dropdownOptions = [
-                {label: "Yes", value: true},
-                {label: "No", value: false}
-            ]
-        }
-
-        let filteredValue = dropdownOptions.filter(option => (option["value"] === value));
-
-        const handleChange = (selectedOption) => {
-            if (isNotNullNorUndefined(selectedOption))
-                onValueChange(selectedOption.value);
-            else
-                onValueChange(null);
-        };
-
-        const gridDropdownHeight = editFieldsHeight ? editFieldsHeight : "25px";
-
-        return <Select
-            name={column.name}
-            value={filteredValue}
-            options={dropdownOptions}
-            onChange={handleChange}
-            hideSelectedOptions={false}
-            styles={{
-                control: (provided) => ({
-                    ...provided,
-                    height: gridDropdownHeight,
-                    minHeight: gridDropdownHeight
-                }),
-                indicatorsContainer: (provided) => ({
-                    ...provided,
-                    height: gridDropdownHeight,
-                    minHeight: gridDropdownHeight,
-                    lineHeight: gridDropdownHeight
-                }),
-                placeholder: (provided) => ({
-                    ...provided,
-                    height: gridDropdownHeight,
-                    minHeight: gridDropdownHeight,
-                    lineHeight: gridDropdownHeight,
-                    marginLeft: 0
-                }),
-                menu: (provided) => ({...provided, lineHeight: 1, zIndex: 1000}),
-                singleValue: (provided) => ({
-                    ...provided,
-                    height: gridDropdownHeight,
-                    minHeight: gridDropdownHeight,
-                    lineHeight: gridDropdownHeight,
-                    marginLeft: 0
-                }),
-                valueContainer: (provided) => ({
-                    ...provided,
-                    height: gridDropdownHeight,
-                    minHeight: gridDropdownHeight,
-                    maxHeight: gridDropdownHeight,
-                    justifyContent: "flex-start",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    flexWrap: "initial"
-                })
-            }}
-        />;
+        return <Form style={{fontSize: "12px", textAlign: "center"}}>
+            <Form.Checkbox onChange={
+                (e, {value}) => {
+                    if (value === true)
+                        onValueChange(trueFalseValues["false"]);
+                    else if (value === false)
+                        onValueChange(trueFalseValues["true"])
+                    else
+                        onValueChange(null);
+                }
+            }
+                           checked={value === trueFalseValues["true"] ? true : value === trueFalseValues["false"] ? false : null}
+                           value={value === trueFalseValues["true"] ? true : value === trueFalseValues["false"] ? false : null}
+                           className={"gridInputField"}
+            />
+        </Form>
     }
 
     if (gridEditFormat === "row") {
@@ -1419,7 +1424,7 @@ const getWrappedEditorComponent = (content, restProps) => {
                position='bottom'
                open={isOpen}
                onOpen={() => setOpen(true)}
-               style={{zIndex: "999", padding: '8px'}}
+               style={{zIndex: "1050", padding: '8px'}}
                offset={[10, -5]}
                trigger={
                    content(
@@ -1515,6 +1520,7 @@ GridComponent.propTypes = {
     //-------------------------------------------------------
     //Filtering
     allowFiltering: PropTypes.bool,
+    filterPlaceholder: PropTypes.string,
 
     //-------------------------------------------------------
     //Grouping
@@ -1554,7 +1560,7 @@ GridComponent.propTypes = {
 
     editConfig: PropTypes.shape({
         editFormat: PropTypes.oneOf([
-            'row', 'cell', 'external'
+            'row', 'cell'
         ]),
         fields: PropTypes.object,
         fieldsHeight: PropTypes.oneOfType([
